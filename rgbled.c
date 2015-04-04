@@ -13,12 +13,20 @@
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgbled"
 
-struct rgb_dev {
-}
+struct rgbled_dev {
+	int ret;
+	dev_t dev_num;
+	struct cdev *cdev;
+	int major_num;
+} rgbleddev = {
+	.major_num = 0;
+	.ret = 0;
+	.dev_num = 0;
+};
 
 // Implementation of file operation methods
 
-int rgb_open(struct inode *inode, struct file *filp)
+int rgbled_open(struct inode *inode, struct file *filp)
 {
 	#ifdef DEBUG
 	printk(KERN_INFO "rgbled: opened device\n");
@@ -27,7 +35,7 @@ int rgb_open(struct inode *inode, struct file *filp)
 }
 
 // Allow threads to read
-int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
+int rgbled_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 {
 	#ifdef DEBUG
 	printk(KERN_INFO "rgbled read from device\n");
@@ -36,13 +44,22 @@ int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 }
 
 // Allow threads to write colors to LED
-ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
+ssize_t rgbled_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
 {
 	#ifdef DEBUG
 	printk(KERN_INFO "rgbled: write to device\n");
 	#endif
 	return 0;
 }
+
+struct file_operations fops = {
+	.owner =	THIS_MODULE,
+	.open = 	rbgled_open,
+	.read = 	rgbled_read,
+	.write =	rgbled_write,
+	.release =	rgbled_close,
+	.ioctl =	rgbled_ioctl
+};
 
 static int __init rgbled_init(void)
 {
