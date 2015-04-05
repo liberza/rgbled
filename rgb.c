@@ -168,8 +168,8 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 
-	rgbdev.ret = class_create(THIS_MODULE, "char");
-	if (rgbdev.ret < 0) {
+	class = class_create(THIS_MODULE, "char");
+	if ( < 0) {
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return rgbdev.ret;
@@ -181,7 +181,7 @@ static int __init rgb_init(void)
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return rgbdev.ret;
-		
+	}
 	// lock init
 
 //	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
