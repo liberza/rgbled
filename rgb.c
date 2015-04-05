@@ -23,6 +23,8 @@ typedef struct {
 	int red, green, blue;
 } query_arg_t;
 
+static struct class *class;
+
 struct rgb_dev {
 	int ret;
 	dev_t dev_num;
@@ -165,9 +167,23 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 
+	rgbdev.ret = class_create(THIS_MODULE, "char");
+	if (rgbdev.ret < 0) {
+		cdev_del(rgbdev.cdev);
+		unregister_chrdev_region(rgbdev.dev_num, 1);
+		return rgbdev.ret;
+	}
+
+	rgbdev.ret = device_create(class, NULL, rgbdev.dev_num, NULL, "rgb");
+	if (rgbdev.ret < 0) {
+		class_destroy(class);
+		cdev_del(rgbdev.cdev);
+		unregister_chrdev_region(rgbdev.dev_num, 1);
+		return rgbdev.ret;
+		
 	// lock init
 
-	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
+//	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
