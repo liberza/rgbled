@@ -139,7 +139,7 @@ struct file_operations fops = {
 static int __init rgb_init(void)
 {
 	// GPIO configuration
-	static struct gpio rgb.led_gpios[] = {
+	static struct gpio rgbdev.led_gpios[] = {
 		{15, GPIOF_OUT_INIT_LOW, "Red"},
 		{16, GPIOF_OUT_INIT_LOW, "Green"},
 		{18, GPIOF_OUT_INIT_LOW, "Blue"},
@@ -176,7 +176,7 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 	// Set GPIOs as output
-	rgbdev.ret = gpio_direction_output(rgb.led_gpios[0].gpio, 0);
+	rgbdev.ret = gpio_direction_output(rgbdev.led_gpios[0].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
