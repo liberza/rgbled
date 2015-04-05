@@ -107,6 +107,9 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			// wait for lock
 			if (mutex_lock_interruptible(rgbdev.lock))
 				return -EINTR;
+			#ifdef DEBUG
+			printk(KERN_INFO "rgb: got lock");
+			#endif
 			red = c.red;
 			green = c.green;
 			blue = c.blue;
@@ -128,7 +131,13 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				gpio_set_value(led_gpios[3].gpio, 0);
 				udelay(10);
 			}
+			#ifdef DEBUG
+			printk(KERN_INFO "rgb: sent LED data");
+			#endif
 			mutex_unlock(rgbdev.lock);
+			#ifdef DEBUG
+			printk(KERN_INFO "rgb: unlocked");
+			#endif
 			break;
 		default:
 			return -EINVAL;
