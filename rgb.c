@@ -113,7 +113,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			green = c.green;
 			blue = c.blue;
 			// send RGB values
-			gpio_set_value(led_gpios[0].gpio, 1);
+			gpio_set_value(led_gpios[0].gpio, 0);
 			#if 0
 			for (i = 10; i >= 0; i--) {
 				if (~(red >> i) & 1) 
