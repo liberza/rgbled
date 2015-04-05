@@ -78,11 +78,20 @@ struct file_operations fops = {
 
 static int __init rgb_init(void)
 {
+	// GPIO configuration
+	static struct gpio led_gpios[] = {
+		{15, GPIOF_OUT_INIT_LOW, "Red"},
+		{16, GPIOF_OUT_INIT_LOW, "Green"},
+		{18, GPIOF_OUT_INIT_LOW, "Blue"},
+		{22, GPIOF_OUT_INIT_LOW, "Clock"},
+	};
+
 	rgbdev.ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "rgb: allocating major num failed\n");
 		return rgbdev.ret;
 	}
+
 	rgbdev.major_num = MAJOR(rgbdev.dev_num);
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: major num = %d\n", rgbdev.major_num);
@@ -96,15 +105,10 @@ static int __init rgb_init(void)
 		printk(KERN_ALERT "rgb: failed to add cdev\n");
 		return rgbdev.ret;
 	}
+
 	// lock init
+
 	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
-	// gpio configuration
-	static struct gpio led_gpios[] = {
-		{15, GPIOF_OUT_INIT_LOW, "Red"},
-		{16, GPIOF_OUT_INIT_LOW, "Green"},
-		{18, GPIOF_OUT_INIT_LOW, "Blue"},
-		{22, GPIOF_OUT_INIT_LOW, "Clock"},
-	};
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
@@ -112,22 +116,22 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 	// Set GPIOs as output
-	rgbdev.ret = gpio_direction_output(led_gpios[0], 0);
+	rgbdev.ret = gpio_direction_output(led_gpios[0].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[1], 0);
+	rgbdev.ret = gpio_direction_output(led_gpios[1].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[2], 0);
+	rgbdev.ret = gpio_direction_output(led_gpios[2].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[3], 0);
+	rgbdev.ret = gpio_direction_output(led_gpios[3].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
