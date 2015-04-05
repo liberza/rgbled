@@ -113,6 +113,8 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			green = c.green;
 			blue = c.blue;
 			// send RGB values
+			gpio_set_value(led_gpios[0].gpio, 1);
+			#ifdef 0
 			for (i = 10; i >= 0; i--) {
 				if (~(red >> i) & 1) 
 					gpio_set_value(led_gpios[0].gpio, 1);
@@ -131,6 +133,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				udelay(10);
 			}
 			printk(KERN_INFO "rgb: sent LED data\n");
+			#endif
 		//	mutex_unlock(&rgbdev.lock);
 			printk(KERN_INFO "rgb: unlocked\n");
 			break;
