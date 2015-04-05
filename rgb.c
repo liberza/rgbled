@@ -86,7 +86,7 @@ int rgb_close(struct inode *inode, struct file *filp)
 long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	int i=0;
-	colors_t c;
+	struct colors_t c;
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
 	printk(KERN_INFO "ioctl_num: %d\n", ioctl_num);
@@ -95,10 +95,11 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	switch (ioctl_num) {
 		case RGB_SET:
 			printk(KERN_INFO "rgb: entered case 1");
-			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t)))
+			if (copy_from_user(&c, (void colors_t *)ioctl_param, sizeof(colors_t))) {
 				printk(KERN_INFO "rgb: copy_from_user failed\n");
-				return -EIO;
+				return -EACCES;
 				break;
+			}
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				printk(KERN_INFO "rgb: invalid color value\n");
 				return -EINVAL;
