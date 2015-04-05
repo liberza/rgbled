@@ -59,7 +59,7 @@ int rgb_close(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-int rgb_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
+long rgb_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
@@ -139,3 +139,15 @@ static int __init rgb_init(void)
 
 	return 0;
 }
+
+static void __exit rgb_exit(void)
+{
+	cdev_dev(rgbdev.cdev);
+	unregister_chrdev_region(rgbdev.dev_num, 1);
+	#ifdef DEBUG
+	printk(KERN_ALERT "rgb: unloaded\n");
+	#endif
+}
+
+module_init(rgb_init);
+module_exit(rgb_exit);
