@@ -68,19 +68,19 @@ int rgb_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, un
 }
 
 struct file_operations fops = {
-	.owner =	THIS_MODULE,
-	.open = 	rgb_open,
-	.read = 	rgb_read,
-	.write =	rgb_write,
-	.release =	rgb_close,
-	.ioctl =	rgb_ioctl
+	.owner =		THIS_MODULE,
+	.open = 		rgb_open,
+	.read = 		rgb_read,
+	.write =		rgb_write,
+	.release =		rgb_close,
+	.unlocked_ioctl =	rgb_ioctl,
 };
 
 static int __init rgb_init(void)
 {
 	rgbdev.ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
 	if (rgbdev.ret < 0) {
-		prink(KERN_ALERT "rgb: allocating major num failed\n");
+		printk(KERN_ALERT "rgb: allocating major num failed\n");
 		return rgbdev.ret;
 	}
 	rgbdev.major_num = MAJOR(rgbdev.dev_num);
@@ -109,7 +109,7 @@ static int __init rgb_init(void)
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error");
-		return rgb.ret;
+		return rgbdev.ret;
 	}
 	// Set GPIOs as output
 	rgbdev.ret = gpio_direction_output(led_gpios[0], 0);
