@@ -7,15 +7,17 @@
 #include <linux/cdev.h>
 #include <linux/mutex.h>
 #include <asm/uaccess.h>
+#include <linux/delay.h>
 #include <linux/gpio.h>
+#include <linux/ioctl.h>
 
 #define DEBUG
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgb"
-int red = 0;
-int green = 0;
-int blue = 0;
+unsigned int red = 0;
+unsigned int green = 0;
+unsigned int blue = 0;
 
 typedef struct {
 	int red, green, blue;
@@ -23,9 +25,11 @@ typedef struct {
 
 struct rgb_dev {
 	int ret;
+	struct gpio led_gpios;
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
+	struct mutex *lock;
 } rgbdev = {
 	.major_num = 0,
 	.ret = 0,
@@ -42,22 +46,20 @@ int rgb_open(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-// Allow threads to read
 int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 {
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb read from device\n");
 	#endif
-	return 0;
+	return -EINVAL;
 }
-
-// Allow threads to write colors to LED
+ 
 ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
 {
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: write to device\n");
 	#endif
-	return 0;
+	return -EINVAL;
 }
 
 int rgb_close(struct inode *inode, struct file *filp)
@@ -89,28 +91,31 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				return -EINVAL;
 				break;
 			}
-			spin_lock(lock);
+			// wait for lock
+			if (mutex_lock_interruptible(rgbdev.lock))
+				return -EINTR;
 			red = q.red;
 			green = q.green;
 			blue = q.blue;
 			// send RGB values
-			for (i = 11; i>= 0; i--) {
+			for (int i = 11; i >= 0; i--) {
 				if (~(red >> i) & 1) 
-					gpio_set_value(led_gpios[0].gpio, 1);
+					gpio_set_value(rgb.led_gpios[0].gpio, 1);
 				if (~(green >> i) & 1) 
-					gpio_set_value(led_gpios[1].gpio, 1);
+					gpio_set_value(rgb.led_gpios[1].gpio, 1);
 				if (~(blue >> i) & 1) 
-					gpio_set_value(led_gpios[2].gpio, 1);
+					gpio_set_value(rgb.led_gpios[2].gpio, 1);
 				udelay(1);
-				gpio_set_value(led_gpios[3].gpio, 1);
+				gpio_set_value(rgb.led_gpios[3].gpio, 1);
 				udelay(4);
-				gpio_set_value(led_gpios[0].gpio, 0);	
-				gpio_set_value(led_gpios[1].gpio, 0);	
-				gpio_set_value(led_gpios[2].gpio, 0);
+				gpio_set_value(rgb.led_gpios[0].gpio, 0);	
+				gpio_set_value(rgb.led_gpios[1].gpio, 0);	
+				gpio_set_value(rgb.led_gpios[2].gpio, 0);
 				udelay(6);
-				gpio_set_value(led_gpios[3].gpio, 0);
+				gpio_set_value(rgb.led_gpios[3].gpio, 0);
 				udelay(10);
 			}
+			mutex_unlock(rgbdev.lock);
 			break;
 		default 
 			return -EINVAL;
@@ -131,7 +136,7 @@ struct file_operations fops = {
 static int __init rgb_init(void)
 {
 	// GPIO configuration
-	static struct gpio led_gpios[] = {
+	static struct gpio rgb.led_gpios[] = {
 		{15, GPIOF_OUT_INIT_LOW, "Red"},
 		{16, GPIOF_OUT_INIT_LOW, "Green"},
 		{18, GPIOF_OUT_INIT_LOW, "Blue"},
@@ -162,28 +167,28 @@ static int __init rgb_init(void)
 
 	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
 	// Request GPIOs
-	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
+	rgbdev.ret = gpio_request_array(rgb.led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error");
 		return rgbdev.ret;
 	}
 	// Set GPIOs as output
-	rgbdev.ret = gpio_direction_output(led_gpios[0].gpio, 0);
+	rgbdev.ret = gpio_direction_output(rgb.led_gpios[0].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[1].gpio, 0);
+	rgbdev.ret = gpio_direction_output(rgb.led_gpios[1].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[2].gpio, 0);
+	rgbdev.ret = gpio_direction_output(rgb.led_gpios[2].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[3].gpio, 0);
+	rgbdev.ret = gpio_direction_output(rgb.led_gpios[3].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
 		return rgbdev.ret;
@@ -196,10 +201,11 @@ static void __exit rgb_exit(void)
 {
 	cdev_del(rgbdev.cdev);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
-	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
+	gpio_free_array(rgb.led_gpios, ARRAY_SIZE(led_gpios));
 	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
 	#endif
+	return 0;
 }
 
 module_init(rgb_init);
