@@ -78,7 +78,7 @@ struct file_operations fops = {
 
 static int __init rgb_init(void)
 {
-	rgb.ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
+	rgbdev.ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
 	if (rgbdev.ret < 0) {
 		prink(KERN_ALERT "rgb: allocating major num failed\n");
 		return rgbdev.ret;
@@ -104,7 +104,7 @@ static int __init rgb_init(void)
 		{16, GPIOF_OUT_INIT_LOW, "Green"},
 		{18, GPIOF_OUT_INIT_LOW, "Blue"},
 		{22, GPIOF_OUT_INIT_LOW, "Clock"},
-	}
+	};
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
