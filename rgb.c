@@ -16,6 +16,9 @@
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgb"
+#define RGBIOCTL_MAGIC 0xB8
+#define RGB_SET _IOW(RGBIOCTL_MAGIC, 1, colors_t *)
+
 unsigned int red = 0;
 unsigned int green = 0;
 unsigned int blue = 0;
@@ -86,15 +89,18 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	colors_t c;
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
-	#endif
 	printk(KERN_INFO "ioctl_num: %d\n", ioctl_num);
+
+	#endif
 	switch (ioctl_num) {
-		case _IOW('c', 3, colors_t*):
+		case RGB_SET:
+			printk(KERN_INFO "rgb: entered case 1");
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t)))
 				#ifdef DEBUG
 				printk(KERN_INFO "rgb: copy_from_user failed\n");
 				#endif
 				return -EACCES;
+				break;
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				#ifdef DEBUG
 				printk(KERN_INFO "rgb: invalid color value\n");
@@ -141,9 +147,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			#endif
 			break;
 		default:
-			#ifdef DEBUG
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
-			#endif
 			return -EINVAL;
 	}
 
@@ -230,18 +234,24 @@ static int __init rgb_init(void)
 
 static void __exit rgb_exit(void)
 {
+	#ifdef DEBUG
 	printk(KERN_INFO "rgb: deleting cdev\n"); 
+	#endif
 	cdev_del(rgbdev.cdev);
+	#ifdef DEBUG
 	printk(KERN_INFO "rgb: gpio_free_array\n"); 
+	#endif
 	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
+	#ifdef DEBUG
 	printk(KERN_INFO "rgb: device_destroy\n");
+	#endif
 	device_destroy(class, rgbdev.dev_num);
+	#ifdef DEBUG
 	printk(KERN_INFO "rgb: class_destroy\n");
+	#endif
 	class_destroy(class);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
-	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
-	#endif
 }
 
 module_init(rgb_init);
