@@ -11,16 +11,13 @@
 
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
-#define DEVICE_NAME	"rgbled"
-#define REDPIN 1
-#define GREENPIN 2
-#define BLUEPIN 3
-struct rgbled_dev {
+#define DEVICE_NAME	"rgb"
+struct rgb_dev {
 	int ret;
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
-} rgbleddev = {
+} rgbdev = {
 	.major_num = 0;
 	.ret = 0;
 	.dev_num = 0;
@@ -28,28 +25,28 @@ struct rgbled_dev {
 
 // Implementation of file operation methods
 
-int rgbled_open(struct inode *inode, struct file *filp)
+int rgb_open(struct inode *inode, struct file *filp)
 {
 	#ifdef DEBUG
-	printk(KERN_INFO "rgbled: opened device\n");
+	printk(KERN_INFO "rgb: opened device\n");
 	#endif
 	return 0;
 }
 
 // Allow threads to read
-int rgbled_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
+int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 {
 	#ifdef DEBUG
-	printk(KERN_INFO "rgbled read from device\n");
+	printk(KERN_INFO "rgb read from device\n");
 	#endif
 	return 0;
 }
 
 // Allow threads to write colors to LED
-ssize_t rgbled_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
+ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
 {
 	#ifdef DEBUG
-	printk(KERN_INFO "rgbled: write to device\n");
+	printk(KERN_INFO "rgb: write to device\n");
 	#endif
 	return 0;
 }
@@ -57,43 +54,57 @@ ssize_t rgbled_write(struct file *filp, const char *src_buf, size_t buf_cnt, lof
 struct file_operations fops = {
 	.owner =	THIS_MODULE,
 	.open = 	rbgled_open,
-	.read = 	rgbled_read,
-	.write =	rgbled_write,
-	.release =	rgbled_close,
-	.ioctl =	rgbled_ioctl
+	.read = 	rgb_read,
+	.write =	rgb_write,
+	.release =	rgb_close,
+	.ioctl =	rgb_ioctl
 };
 
-static int __init rgbled_init(void)
+static int __init rgb_init(void)
 {
-	rgbled.ret = alloc_chrdev_region(&rgbleddev.dev_num, 0, 1, DEVICE_NAME);
-	if (rgbleddev.ret < 0) {
-		prink(KERN_ALERT "rgbled: allocating major number failed\n");
-		return rgbleddev.ret;
+	rgb.ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
+	if (rgbdev.ret < 0) {
+		prink(KERN_ALERT "rgb: allocating major num failed\n");
+		return rgbdev.ret;
 	}
-	rgbleddev.major_num = MAJOTR(rgbleddev.dev_num);
+	rgbdev.major_num = MAJOTR(rgbdev.dev_num);
 	#ifdef DEBUG
-	printk(KERN_INFO "rgbled: major num = %d\n", rgbleddev.major_num);
+	printk(KERN_INFO "rgb: major num = %d\n", rgbdev.major_num);
 	#endif
 
-	rgbleddev.cdev = cdev_alloc();
-	rgbleddev.cdev->ops = &fops;
-	rgbleddev.cdev->owner = THIS_MODULE;
-	rgbleddev.ret = cdev_add(rgbleddev.cdev, rgbleddev.dev_num, 1);
-	if (rgbleddev.ret < 0) {
-		printk(KERN_ALERT "rgbled: failed to add cdev\n");
-		return rgbleddev.ret;
+	rgbdev.cdev = cdev_alloc();
+	rgbdev.cdev->ops = &fops;
+	rgbdev.cdev->owner = THIS_MODULE;
+	rgbdev.ret = cdev_add(rgbdev.cdev, rgbdev.dev_num, 1);
+	if (rgbdev.ret < 0) {
+		printk(KERN_ALERT "rgb: failed to add cdev\n");
+		return rgbdev.ret;
 	}
 	// lock init
-	rgbleddev.dev_num = MKDEV(rgbleddev.major_num, 0);
+	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
 	// gpio configuration
-	if (gpio_direction_output(REDPIN, 0) < 0) {
+	static struct gpio led_gpios[] = {
+		{15, GPIOF_OUT_INIT_LOW, "Red"},
+		{16, GPIOF_OUT_INIT_LOW, "Green"},
+		{18, GPIOF_OUT_INIT_LOW, "Blue"},
+		{22, GPIOF_OUT_INIT_LOW, "Clock"},
+	}
+	// Request GPIOs
+	if (gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios)) < 0) {
+		perror("Failed to request gpio: ");
+	}
+	// Set GPIOs as output
+	if (gpio_direction_output(led_gpios[0], 0) < 0) {
 		perror("setting REDPIN as output failed: ");
 	}
-	if (gpio_direction_output(GREENPIN, 0) < 0) {
+	if (gpio_direction_output(led_gpios[1], 0) < 0) {
 		perror("setting GREENPIN as output failed: ");
 	}
-	if (gpio_direction_output(BLUEPIN, 0) < 0) {
+	if (gpio_direction_output(led_gpios[2], 0) < 0) {
 		perror("setting BLUEPIN as output failed: ");
+	}
+	if (gpio_direction_output(led_gpios[3], 0) < 0) {
+		perror("setting CLKPIN as output failed: ");
 	}
 	
 	return 0;
