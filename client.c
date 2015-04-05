@@ -28,7 +28,8 @@ int main(int argc, char *argv[])
 		perror("open: ");
 		exit(EXIT_FAILURE);
 	}
-	ioctl(fh, RGB_SET, &c);
+	if (ioctl(fh, RGB_SET, &c) == -1)
+		perror("ioctl: ");
 	close(fh);
 	return 0;
 }
