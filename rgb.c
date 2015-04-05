@@ -51,6 +51,14 @@ ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t
 	return 0;
 }
 
+int rgb_close(struct inode *inode, struct file *filp)
+{
+	#ifdef DEBUG
+	printk(KERN_INFO "rgb: close device\n");
+	#endif
+	return 0;
+}
+
 int rgb_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	#ifdef DEBUG
@@ -61,7 +69,7 @@ int rgb_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, un
 
 struct file_operations fops = {
 	.owner =	THIS_MODULE,
-	.open = 	rbgled_open,
+	.open = 	rgb_open,
 	.read = 	rgb_read,
 	.write =	rgb_write,
 	.release =	rgb_close,
