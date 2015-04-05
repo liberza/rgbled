@@ -87,28 +87,29 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
 	#endif
+	printk(KERN_INFO "ioctl_num: %d\n", ioctl_num);
 	switch (ioctl_num) {
 		case _IOW('c', 3, colors_t*):
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t)))
 				#ifdef DEBUG
-				printk(KERN_INFO "rgb: copy_from_user failed");
+				printk(KERN_INFO "rgb: copy_from_user failed\n");
 				#endif
 				return -EACCES;
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				#ifdef DEBUG
-				printk(KERN_INFO "rgb: invalid color value");
+				printk(KERN_INFO "rgb: invalid color value\n");
 				#endif
 				return -EINVAL;
 				break;
 			}
 			// wait for lock
 			#ifdef DEBUG
-			printk(KERN_INFO "rgb: wait for lock");
+			printk(KERN_INFO "rgb: wait for lock\n");
 			#endif
 			if (!mutex_lock_interruptible(&rgbdev.lock))
 				return -EINTR;
 			#ifdef DEBUG
-			printk(KERN_INFO "rgb: got lock");
+			printk(KERN_INFO "rgb: got lock\n");
 			#endif
 			red = c.red;
 			green = c.green;
@@ -132,16 +133,16 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				udelay(10);
 			}
 			#ifdef DEBUG
-			printk(KERN_INFO "rgb: sent LED data");
+			printk(KERN_INFO "rgb: sent LED data\n");
 			#endif
 			mutex_unlock(&rgbdev.lock);
 			#ifdef DEBUG
-			printk(KERN_INFO "rgb: unlocked");
+			printk(KERN_INFO "rgb: unlocked\n");
 			#endif
 			break;
 		default:
 			#ifdef DEBUG
-			printk(KERN_INFO "rgb: invalid ioctl command");
+			printk(KERN_INFO "rgb: invalid ioctl command\n");
 			#endif
 			return -EINVAL;
 	}
@@ -199,28 +200,28 @@ static int __init rgb_init(void)
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
-		printk(KERN_ALERT "gpio_request_array() error");
+		printk(KERN_ALERT "gpio_request_array() error\n");
 		return rgbdev.ret;
 	}
 	// Set GPIOs as output
 	rgbdev.ret = gpio_direction_output(led_gpios[0].gpio, 0);
 	if (rgbdev.ret < 0) {
-		printk(KERN_ALERT "gpio_direction_output() error");
+		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
 	rgbdev.ret = gpio_direction_output(led_gpios[1].gpio, 0);
 	if (rgbdev.ret < 0) {
-		printk(KERN_ALERT "gpio_direction_output() error");
+		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
 	rgbdev.ret = gpio_direction_output(led_gpios[2].gpio, 0);
 	if (rgbdev.ret < 0) {
-		printk(KERN_ALERT "gpio_direction_output() error");
+		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
 	rgbdev.ret = gpio_direction_output(led_gpios[3].gpio, 0);
 	if (rgbdev.ret < 0) {
-		printk(KERN_ALERT "gpio_direction_output() error");
+		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
 
@@ -229,13 +230,13 @@ static int __init rgb_init(void)
 
 static void __exit rgb_exit(void)
 {
-	printk(KERN_INFO "rgb: deleting cdev"); 
+	printk(KERN_INFO "rgb: deleting cdev\n"); 
 	cdev_del(rgbdev.cdev);
-	printk(KERN_INFO "rgb: gpio_free_array"); 
+	printk(KERN_INFO "rgb: gpio_free_array\n"); 
 	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
-	printk(KERN_INFO "rgb: device_destroy");
+	printk(KERN_INFO "rgb: device_destroy\n");
 	device_destroy(class, rgbdev.dev_num);
-	printk(KERN_INFO "rgb: class_destroy");
+	printk(KERN_INFO "rgb: class_destroy\n");
 	class_destroy(class);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
 	#ifdef DEBUG
