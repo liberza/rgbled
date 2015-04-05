@@ -88,13 +88,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	printk(KERN_INFO "rgb: ioctl\n");
 	#endif
 	switch (ioctl_num) {
-		case _IOR('c', 1, colors_t*):
-			return -EINVAL;
-			break;
-		case _IO('c', 2):
-			return -EINVAL;
-			break;
-		case _IOWR('c', 3, colors_t*):
+		case _IOW('c', 3, colors_t*):
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t)))
 				#ifdef DEBUG
 				printk(KERN_INFO "rgb: copy_from_user failed");
@@ -146,6 +140,9 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			#endif
 			break;
 		default:
+			#ifdef DEBUG
+			printk(KERN_INFO "rgb: invalid ioctl command");
+			#endif
 			return -EINVAL;
 	}
 
