@@ -25,7 +25,7 @@ typedef struct {
 
 struct rgb_dev {
 	int ret;
-	struct gpio led_gpios;
+	struct gpio *led_gpios;
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
