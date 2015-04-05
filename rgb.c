@@ -168,13 +168,13 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 
-	if (IS_ERR(class = class_create(THIS_MODULE, "char")));
+	if (IS_ERR(class = class_create(THIS_MODULE, "char"))) {
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return -1;
 	}
 
-	if (IS_ERR(device_create(class, NULL, rgbdev.dev_num, NULL, "rgb")));
+	if (IS_ERR(device_create(class, NULL, rgbdev.dev_num, NULL, "rgb"))) {
 		class_destroy(class);
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
