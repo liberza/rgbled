@@ -226,3 +226,7 @@ static void __exit rgb_exit(void)
 
 module_init(rgb_init);
 module_exit(rgb_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR(DRIVER_AUTHOR);
+MODULE_DESCRIPTION(DRIVER_DESC);
