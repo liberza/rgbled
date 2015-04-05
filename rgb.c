@@ -53,7 +53,11 @@ ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t
 
 int rgb_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
 {
-
+	#ifdef DEBUG
+	printk(KERN_INFO "rgb: ioctl\n");
+	#endif
+	return 0;
+}
 
 struct file_operations fops = {
 	.owner =	THIS_MODULE,
