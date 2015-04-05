@@ -25,7 +25,7 @@ typedef struct {
 
 struct rgb_dev {
 	int ret;
-	struct gpio *led_gpios;
+	struct gpio led_gpios;
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
@@ -204,7 +204,7 @@ static void __exit rgb_exit(void)
 {
 	cdev_del(rgbdev.cdev);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
-	gpio_free_array(rgbdev.(*led_gpios), ARRAY_SIZE(rgbdev.(*led_gpios)));
+	gpio_free_array(rgbdev.led_gpios, ARRAY_SIZE(rgbdev.led_gpios));
 	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
 	#endif
