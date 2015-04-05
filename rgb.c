@@ -106,31 +106,31 @@ static int __init rgb_init(void)
 		{22, GPIOF_OUT_INIT_LOW, "Clock"},
 	}
 	// Request GPIOs
-	rgb.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
-	if (rgb.ret < 0) {
+	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
+	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error");
 		return rgb.ret;
 	}
 	// Set GPIOs as output
-	rgb.ret = gpio_direction_output(led_gpios[0], 0)
-	if (rgb.ret < 0) {
+	rgbdev.ret = gpio_direction_output(led_gpios[0], 0);
+	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
-		return rgb.ret;
+		return rgbdev.ret;
 	}
-	gpio_direction_output(led_gpios[1], 0)
-	if (rgb.ret < 0) {
+	rgbdev.ret = gpio_direction_output(led_gpios[1], 0);
+	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
-		return rgb.ret;
+		return rgbdev.ret;
 	}
-	gpio_direction_output(led_gpios[2], 0)
-	if (rgb.ret < 0) {
+	rgbdev.ret = gpio_direction_output(led_gpios[2], 0);
+	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
-		return rgb.ret;
+		return rgbdev.ret;
 	}
-	gpio_direction_output(led_gpios[3], 0)
-	if (rgb.ret < 0) {
+	rgbdev.ret = gpio_direction_output(led_gpios[3], 0);
+	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error");
-		return rgb.ret;
+		return rgbdev.ret;
 	}
 
 	return 0;
