@@ -9,7 +9,7 @@
 #include <asm/uaccess.h>
 #include <linux/gpio.h>
 
-#define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>
+#define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgb"
 struct rgb_dev {
