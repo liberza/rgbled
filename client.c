@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#define RGBIOCTL_MAGIC 0xB8
+#define RGB_SET _IOW(RGBIOCTL_MAGIC, 1, colors_t *)
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +28,7 @@ int main(int argc, char *argv[])
 		perror("open: ");
 		exit(EXIT_FAILURE);
 	}
-	ioctl(fh, (_IOW('c', 3, colors_t *)), &c);
+	ioctl(fh, RGB_SET, &c);
 	close(fh);
 	return 0;
 }
