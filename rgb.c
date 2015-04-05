@@ -31,7 +31,7 @@ struct rgb_dev {
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
-	struct mutex *lock;
+	struct mutex lock;
 } rgbdev = {
 	.major_num = 0,
 	.ret = 0,
@@ -105,7 +105,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			#ifdef DEBUG
 			printk(KERN_INFO "rgb: wait for lock");
 			#endif
-			if (mutex_lock_interruptible(rgbdev.lock))
+			if (!mutex_lock_interruptible(&rgbdev.lock))
 				return -EINTR;
 			#ifdef DEBUG
 			printk(KERN_INFO "rgb: got lock");
@@ -134,7 +134,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			#ifdef DEBUG
 			printk(KERN_INFO "rgb: sent LED data");
 			#endif
-			mutex_unlock(rgbdev.lock);
+			mutex_unlock(&rgbdev.lock);
 			#ifdef DEBUG
 			printk(KERN_INFO "rgb: unlocked");
 			#endif
@@ -194,7 +194,7 @@ static int __init rgb_init(void)
 		return -1;
 	}
 	// lock init
-//	mutex_init(rgbdev.lock);
+	mutex_init(&rgbdev.lock);
 
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
@@ -233,7 +233,7 @@ static void __exit rgb_exit(void)
 	unregister_chrdev_region(rgbdev.dev_num, 1);
 	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
 	class_destroy(class);
-	device_destroy(class, rgbdev.dev_num);
+	device_destroy(class MKDEV(rgbdev.major_num));
 	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
 	#endif
