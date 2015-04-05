@@ -168,19 +168,17 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 
-	class = class_create(THIS_MODULE, "char");
-//	if (rgbdev.ret < 0) {
-//		cdev_del(rgbdev.cdev);
-//		unregister_chrdev_region(rgbdev.dev_num, 1);
-//		return rgbdev.ret;
-//	}
+	if (IS_ERR(class = class_create(THIS_MODULE, "char"));
+		cdev_del(rgbdev.cdev);
+		unregister_chrdev_region(rgbdev.dev_num, 1);
+		return -1;
+	}
 
-	rgbdev.ret = device_create(class, NULL, rgbdev.dev_num, NULL, "rgb");
-	if (rgbdev.ret < 0) {
+	if (IS_ERR(device_create(class, NULL, rgbdev.dev_num, NULL, "rgb"));
 		class_destroy(class);
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
-		return rgbdev.ret;
+		return -1;
 	}
 	// lock init
 
