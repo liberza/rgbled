@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 		perror("open: ");
 		exit(EXIT_FAILURE);
 	}
-	ioctl(fh, (_IOW('c', 3, colors_t *)), &c);
+	ioctl(fh, (_IOWR('c', 3, colors_t *)), &c);
 	close(fh);
 	return 0;
 }
