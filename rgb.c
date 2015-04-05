@@ -86,7 +86,7 @@ int rgb_close(struct inode *inode, struct file *filp)
 long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	int i=0;
-	struct colors_t c;
+	colors_t c;
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
 	printk(KERN_INFO "ioctl_num: %d\n", ioctl_num);
