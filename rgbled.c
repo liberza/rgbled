@@ -12,7 +12,9 @@
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgbled"
-
+#define REDPIN 1
+#define GREENPIN 2
+#define BLUEPIN 3
 struct rgbled_dev {
 	int ret;
 	dev_t dev_num;
@@ -83,5 +85,16 @@ static int __init rgbled_init(void)
 	}
 	// lock init
 	rgbleddev.dev_num = MKDEV(rgbleddev.major_num, 0);
+	// gpio configuration
+	if (gpio_direction_output(REDPIN, 0) < 0) {
+		perror("setting REDPIN as output failed: ");
+	}
+	if (gpio_direction_output(GREENPIN, 0) < 0) {
+		perror("setting GREENPIN as output failed: ");
+	}
+	if (gpio_direction_output(BLUEPIN, 0) < 0) {
+		perror("setting BLUEPIN as output failed: ");
+	}
+	
 	return 0;
 }
