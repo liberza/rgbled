@@ -229,6 +229,7 @@ static void __exit rgb_exit(void)
 	cdev_del(rgbdev.cdev);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
 	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
+	class_destroy(class);
 	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
 	#endif
