@@ -9,9 +9,18 @@
 #include <asm/uaccess.h>
 #include <linux/gpio.h>
 
+#define DEBUG
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgb"
+int red = 0;
+int green = 0;
+int blue = 0;
+
+typedef struct {
+	int red, green, blue;
+} query_arg_t;
+
 struct rgb_dev {
 	int ret;
 	dev_t dev_num;
@@ -59,11 +68,54 @@ int rgb_close(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-long rgb_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
+long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
 {
+	query_arg_t q;
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
 	#endif
+	switch (cmd) {
+		case QUERY_GET_VARIABLES:
+			return -EINVAL;
+			break;
+		case QUERY_CLR_VARIABLES:
+			return -EINVAL;
+			break;
+		case QUERY_SET_VARIABLES:
+			if ((q.red > 2047) | (q.green > 2047) | (q.blue > 2047)) {
+				#ifdef DEBUG
+				printk(KERN_INFO "rgb: invalid color value");
+				#endif
+				return -EINVAL;
+				break;
+			}
+			spin_lock(lock);
+			red = q.red;
+			green = q.green;
+			blue = q.blue;
+			// send RGB values
+			for (i = 11; i>= 0; i--) {
+				if (~(red >> i) & 1) 
+					gpio_set_value(led_gpios[0].gpio, 1);
+				if (~(green >> i) & 1) 
+					gpio_set_value(led_gpios[1].gpio, 1);
+				if (~(blue >> i) & 1) 
+					gpio_set_value(led_gpios[2].gpio, 1);
+				udelay(1);
+				gpio_set_value(led_gpios[3].gpio, 1);
+				udelay(4);
+				gpio_set_value(led_gpios[0].gpio, 0);	
+				gpio_set_value(led_gpios[1].gpio, 0);	
+				gpio_set_value(led_gpios[2].gpio, 0);
+				udelay(6);
+				gpio_set_value(led_gpios[3].gpio, 0);
+				udelay(10);
+			}
+			break;
+		default 
+			return -EINVAL;
+	}
+
 	return 0;
 }
 
@@ -144,6 +196,7 @@ static void __exit rgb_exit(void)
 {
 	cdev_del(rgbdev.cdev);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
+	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
 	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
 	#endif
