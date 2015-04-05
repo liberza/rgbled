@@ -10,6 +10,7 @@
 #include <linux/delay.h>
 #include <linux/gpio.h>
 #include <linux/ioctl.h>
+#include <linux/device.h>
 
 #define DEBUG
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
