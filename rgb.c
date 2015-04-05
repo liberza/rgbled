@@ -18,9 +18,9 @@ struct rgb_dev {
 	struct cdev *cdev;
 	int major_num;
 } rgbdev = {
-	.major_num = 0;
-	.ret = 0;
-	.dev_num = 0;
+	.major_num = 0,
+	.ret = 0,
+	.dev_num = 0,
 };
 
 // Implementation of file operation methods
