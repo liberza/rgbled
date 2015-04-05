@@ -72,18 +72,19 @@ int rgb_close(struct inode *inode, struct file *filp)
 
 long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
 {
+	int i=0;
 	query_arg_t q;
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
 	#endif
 	switch (ioctl_num) {
-		case QUERY_GET_VARIABLES:
+		case _IOR('q', 1, query_arg_t*):
 			return -EINVAL;
 			break;
-		case QUERY_CLR_VARIABLES:
+		case _IO('q', 2):
 			return -EINVAL;
 			break;
-		case QUERY_SET_VARIABLES:
+		case _IOW('q', 3, query_arg_t*):
 			if (copy_from_user(&q, (query_arg_t *)ioctl_param, sizeof(query_arg_t)))
 				return -EACCES;
 			if ((q.red > 2047) | (q.green > 2047) | (q.blue > 2047)) {
