@@ -231,14 +231,13 @@ static void __exit rgb_exit(void)
 {
 	printk(KERN_INFO "rgb: deleting cdev"); 
 	cdev_del(rgbdev.cdev);
-	printk(KERN_INFO "rgb: unregister_chrdev_region");
-	unregister_chrdev_region(rgbdev.dev_num, 1);
 	printk(KERN_INFO "rgb: gpio_free_array"); 
 	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
+	printk(KERN_INFO "rgb: device_destroy");
+	device_destroy(class, rgbdev.dev_num);
 	printk(KERN_INFO "rgb: class_destroy");
 	class_destroy(class);
-	printk(KERN_INFO "rgb: device_destroy");
-	device_destroy(class, MKDEV(rgbdev.major_num, 0));
+	unregister_chrdev_region(rgbdev.dev_num, 1);
 	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
 	#endif
