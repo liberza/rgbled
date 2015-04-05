@@ -169,11 +169,11 @@ static int __init rgb_init(void)
 	}
 
 	class = class_create(THIS_MODULE, "char");
-	if ( < 0) {
-		cdev_del(rgbdev.cdev);
-		unregister_chrdev_region(rgbdev.dev_num, 1);
-		return rgbdev.ret;
-	}
+//	if (rgbdev.ret < 0) {
+//		cdev_del(rgbdev.cdev);
+//		unregister_chrdev_region(rgbdev.dev_num, 1);
+//		return rgbdev.ret;
+//	}
 
 	rgbdev.ret = device_create(class, NULL, rgbdev.dev_num, NULL, "rgb");
 	if (rgbdev.ret < 0) {
