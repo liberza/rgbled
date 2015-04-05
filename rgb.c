@@ -109,7 +109,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				break;
 			}
 			// wait for lock
-		//	if mutex_trylock(&rgbdev.lock);
+			if mutex_lock(&rgbdev.lock);
 			
 			red = c.red;
 			green = c.green;
@@ -133,7 +133,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				udelay(10);
 			}
 			printk(KERN_INFO "rgb: sent LED data\n");
-		//	mutex_unlock(&rgbdev.lock);
+			mutex_unlock(&rgbdev.lock);
 			printk(KERN_INFO "rgb: unlocked\n");
 			break;
 		default:
