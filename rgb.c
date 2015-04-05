@@ -22,7 +22,7 @@ unsigned int blue = 0;
 
 typedef struct {
 	int red, green, blue;
-} query_arg_t;
+} colors_t;
 
 static struct class *class;
 
@@ -83,21 +83,21 @@ int rgb_close(struct inode *inode, struct file *filp)
 long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	int i=0;
-	query_arg_t q;
+	colors_t c;
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: ioctl\n");
 	#endif
 	switch (ioctl_num) {
-		case _IOR('q', 1, query_arg_t*):
+		case _IOR('q', 1, colors_t*):
 			return -EINVAL;
 			break;
 		case _IO('q', 2):
 			return -EINVAL;
 			break;
-		case _IOW('q', 3, query_arg_t*):
-			if (copy_from_user(&q, (query_arg_t *)ioctl_param, sizeof(query_arg_t)))
+		case _IOW('q', 3, colors_t*):
+			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t)))
 				return -EACCES;
-			if ((q.red > 2047) | (q.green > 2047) | (q.blue > 2047)) {
+			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				#ifdef DEBUG
 				printk(KERN_INFO "rgb: invalid color value");
 				#endif
@@ -107,9 +107,9 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			// wait for lock
 			if (mutex_lock_interruptible(rgbdev.lock))
 				return -EINTR;
-			red = q.red;
-			green = q.green;
-			blue = q.blue;
+			red = c.red;
+			green = c.green;
+			blue = c.blue;
 			// send RGB values
 			for (i = 10; i >= 0; i--) {
 				if (~(red >> i) & 1) 
@@ -168,6 +168,7 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 
+	// create device file
 	if (IS_ERR(class = class_create(THIS_MODULE, "char"))) {
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
@@ -181,8 +182,8 @@ static int __init rgb_init(void)
 		return -1;
 	}
 	// lock init
+	mutex_init(rgbdev.lock);
 
-//	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
