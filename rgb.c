@@ -88,14 +88,16 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	printk(KERN_INFO "rgb: ioctl\n");
 	#endif
 	switch (ioctl_num) {
-		case _IOR('q', 1, colors_t*):
+		case _IOR('c', 1, colors_t*):
 			return -EINVAL;
 			break;
-		case _IO('q', 2):
+		case _IO('c', 2):
 			return -EINVAL;
 			break;
-		case _IOW('q', 3, colors_t*):
+		case _IOW('c', 3, colors_t*):
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t)))
+				#ifdef DEBUG
+				printk(KERN_INFO "rgb: copy_from_user failed");
 				return -EACCES;
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				#ifdef DEBUG
@@ -105,6 +107,9 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				break;
 			}
 			// wait for lock
+			#ifdef DEBUG
+			printk(KERN_INFO "rgb: wait for lock");
+			#endif
 			if (mutex_lock_interruptible(rgbdev.lock))
 				return -EINTR;
 			#ifdef DEBUG
