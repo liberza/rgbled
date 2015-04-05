@@ -191,7 +191,7 @@ static int __init rgb_init(void)
 		return -1;
 	}
 	// lock init
-	mutex_init(rgbdev.lock);
+//	mutex_init(rgbdev.lock);
 
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
