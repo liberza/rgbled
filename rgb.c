@@ -83,7 +83,7 @@ static int __init rgb_init(void)
 		prink(KERN_ALERT "rgb: allocating major num failed\n");
 		return rgbdev.ret;
 	}
-	rgbdev.major_num = MAJOTR(rgbdev.dev_num);
+	rgbdev.major_num = MAJOR(rgbdev.dev_num);
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: major num = %d\n", rgbdev.major_num);
 	#endif
@@ -106,7 +106,7 @@ static int __init rgb_init(void)
 		{22, GPIOF_OUT_INIT_LOW, "Clock"},
 	}
 	// Request GPIOs
-	rgb.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios))
+	rgb.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgb.ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error");
 		return rgb.ret;
