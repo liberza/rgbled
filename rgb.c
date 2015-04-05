@@ -51,6 +51,10 @@ ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t
 	return 0;
 }
 
+int rgb_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
+{
+
+
 struct file_operations fops = {
 	.owner =	THIS_MODULE,
 	.open = 	rbgled_open,
@@ -90,22 +94,32 @@ static int __init rgb_init(void)
 		{22, GPIOF_OUT_INIT_LOW, "Clock"},
 	}
 	// Request GPIOs
-	if (gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios)) < 0) {
-		perror("Failed to request gpio: ");
+	rgb.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios))
+	if (rgb.ret < 0) {
+		printk(KERN_ALERT "gpio_request_array() error");
+		return rgb.ret;
 	}
 	// Set GPIOs as output
-	if (gpio_direction_output(led_gpios[0], 0) < 0) {
-		perror("setting REDPIN as output failed: ");
+	rgb.ret = gpio_direction_output(led_gpios[0], 0)
+	if (rgb.ret < 0) {
+		printk(KERN_ALERT "gpio_direction_output() error");
+		return rgb.ret;
 	}
-	if (gpio_direction_output(led_gpios[1], 0) < 0) {
-		perror("setting GREENPIN as output failed: ");
+	gpio_direction_output(led_gpios[1], 0)
+	if (rgb.ret < 0) {
+		printk(KERN_ALERT "gpio_direction_output() error");
+		return rgb.ret;
 	}
-	if (gpio_direction_output(led_gpios[2], 0) < 0) {
-		perror("setting BLUEPIN as output failed: ");
+	gpio_direction_output(led_gpios[2], 0)
+	if (rgb.ret < 0) {
+		printk(KERN_ALERT "gpio_direction_output() error");
+		return rgb.ret;
 	}
-	if (gpio_direction_output(led_gpios[3], 0) < 0) {
-		perror("setting CLKPIN as output failed: ");
+	gpio_direction_output(led_gpios[3], 0)
+	if (rgb.ret < 0) {
+		printk(KERN_ALERT "gpio_direction_output() error");
+		return rgb.ret;
 	}
-	
+
 	return 0;
 }
