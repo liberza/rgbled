@@ -103,19 +103,19 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			// send RGB values
 			for (i = 10; i >= 0; i--) {
 				if (~(red >> i) & 1) 
-					gpio_set_value(rgbdev->led_gpios[0].gpio, 1);
+					gpio_set_value(rgbdev.led_gpios[0].gpio, 1);
 				if (~(green >> i) & 1) 
-					gpio_set_value(rgbdev->led_gpios[1].gpio, 1);
+					gpio_set_value(rgbdev.led_gpios[1].gpio, 1);
 				if (~(blue >> i) & 1) 
-					gpio_set_value(rgbdev->led_gpios[2].gpio, 1);
+					gpio_set_value(rgbdev.led_gpios[2].gpio, 1);
 				udelay(1);
-				gpio_set_value(rgbdev->led_gpios[3].gpio, 1);
+				gpio_set_value(rgbdev.led_gpios[3].gpio, 1);
 				udelay(4);
-				gpio_set_value(rgbdev->led_gpios[0].gpio, 0);	
-				gpio_set_value(rgbdev->led_gpios[1].gpio, 0);	
-				gpio_set_value(rgbdev->led_gpios[2].gpio, 0);
+				gpio_set_value(rgbdev.led_gpios[0].gpio, 0);	
+				gpio_set_value(rgbdev.led_gpios[1].gpio, 0);	
+				gpio_set_value(rgbdev.led_gpios[2].gpio, 0);
 				udelay(6);
-				gpio_set_value(rgbdev->led_gpios[3].gpio, 0);
+				gpio_set_value(rgbdev.led_gpios[3].gpio, 0);
 				udelay(10);
 			}
 			mutex_unlock(rgbdev.lock);
@@ -170,7 +170,7 @@ static int __init rgb_init(void)
 
 	rgbdev.dev_num = MKDEV(rgbdev.major_num, 0);
 	// Request GPIOs
-	rgbdev.ret = gpio_request_array(rgbdev->led_gpios, ARRAY_SIZE(rgbdev->led_gpios));
+	rgbdev.ret = gpio_request_array(rgbdev.led_gpios, ARRAY_SIZE(rgbdev.led_gpios));
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error");
 		return rgbdev.ret;
@@ -204,7 +204,7 @@ static void __exit rgb_exit(void)
 {
 	cdev_del(rgbdev.cdev);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
-	gpio_free_array(rgbdev->led_gpios, ARRAY_SIZE(rgbdev->led_gpios));
+	gpio_free_array(rgbdev.led_gpios, ARRAY_SIZE(rgbdev.led_gpios));
 	#ifdef DEBUG
 	printk(KERN_ALERT "rgb: unloaded\n");
 	#endif
