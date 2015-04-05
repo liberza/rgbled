@@ -96,27 +96,19 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 		case RGB_SET:
 			printk(KERN_INFO "rgb: entered case 1");
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t)))
-				#ifdef DEBUG
 				printk(KERN_INFO "rgb: copy_from_user failed\n");
-				#endif
 				return -EACCES;
 				break;
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
-				#ifdef DEBUG
 				printk(KERN_INFO "rgb: invalid color value\n");
-				#endif
 				return -EINVAL;
 				break;
 			}
 			// wait for lock
-			#ifdef DEBUG
 			printk(KERN_INFO "rgb: wait for lock\n");
-			#endif
 			if (!mutex_lock_interruptible(&rgbdev.lock))
 				return -EINTR;
-			#ifdef DEBUG
 			printk(KERN_INFO "rgb: got lock\n");
-			#endif
 			red = c.red;
 			green = c.green;
 			blue = c.blue;
@@ -138,13 +130,9 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				gpio_set_value(led_gpios[3].gpio, 0);
 				udelay(10);
 			}
-			#ifdef DEBUG
 			printk(KERN_INFO "rgb: sent LED data\n");
-			#endif
 			mutex_unlock(&rgbdev.lock);
-			#ifdef DEBUG
 			printk(KERN_INFO "rgb: unlocked\n");
-			#endif
 			break;
 		default:
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
