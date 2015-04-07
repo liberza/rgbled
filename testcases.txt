@@ -13,8 +13,8 @@
 | 9	| r=2047,	g=2047,		b=2048	| -EINVAL	|
 | 10	| open device as r/w			| -ENOTTY	|
 | 11	| open device as read-only		| -ENOTTY	|
-| 12	| attempt write to device file		| -ENOTSUP	|
-| 13	| attempt read from device file		| -ENOTSUP	|
+| 12	| attempt write to device file		| -ENOSYS	|
+| 13	| attempt read from device file		| -EINVAL	|
 | 14	| r=2047,	g=2047,		b=2047	| LED white	|
 | 15	| r=2047,	g=0		b=0	| LED red	|
 | 16	| r=0,		g=2047,		b=0	| LED green	|
