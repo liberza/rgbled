@@ -55,6 +55,8 @@ int rgb_open(struct inode *inode, struct file *filp)
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: opened device\n");
 	#endif
+        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EINVAL;
+        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EINVAL;
 	return 0;
 }
 
