@@ -155,11 +155,26 @@ int main(int argc, char *argv[])
 	
 	// 13
 	errno = 0;
+	close(fh);
+	// open as read-only
+	fh = open("/dev/rgb", O_RDONLY);
+	if (fh < 0) {
+		perror("open: ");
+		exit(EXIT_FAILURE);
+	}
+
 	if ((read(fh, NULL, 1)) < 0) {
 		if (errno == EINVAL) printf("13: pass\n");
 		else printf("13: fail\n");
 	}
 	else printf("13: fail\n");
+	close(fh);
+	// open as write-only for next tests
+	fh = open("/dev/rgb", O_WRONLY);
+	if (fh < 0) {
+		perror("open: ");
+		exit(EXIT_FAILURE);
+	}
 	
 	// 14
 	c.red = 0;
