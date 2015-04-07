@@ -14,6 +14,9 @@
 
 // Tests rgb driver for correct output
 // See testcases.txt for individual test details
+// NOTE: tests 13 and 19 will fail if user doesn't have
+// 	 read/write permission on /dev/rgb
+
 int main(int argc, char *argv[])
 {
 	typedef struct {
@@ -220,8 +223,8 @@ int main(int argc, char *argv[])
 	close(fh);
 	// open as read/write
 	fh = open("/dev/rgb", O_RDWR);
-	if (errno == EINVAL) printf("13: pass\n");
-	else printf("13: fail\n");
+	if (errno == EINVAL) printf("19: pass\n");
+	else printf("19: fail\n");
 	
 	close(fh);
 	return 0;
