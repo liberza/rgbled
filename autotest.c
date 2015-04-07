@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 	// 12
 	errno = 0;
 	if ((write(fh, NULL, 0)) < 0) {
-		if (errno == ENOTSUP) printf("12: pass\n");
+		if (errno == ENOSYS) printf("12: pass\n");
 		else printf("12: fail\n");
 	}
 	else printf("12: fail\n");
@@ -155,9 +155,11 @@ int main(int argc, char *argv[])
 	
 	// 13
 	errno = 0;
-	if ((read(fh, NULL, 0)) == ENOTSUP) printf("13: pass\n");
+	if ((read(fh, NULL, 0)) < 0) {
+		if (errno == ENOSYS) printf("13: pass\n");
+		else printf("13: fail\n");
+	}
 	else printf("13: fail\n");
-	
 	
 	// 14
 	c.red = 0;
