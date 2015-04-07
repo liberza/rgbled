@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 	c.red = atoi(argv[1]);
 	c.green = atoi(argv[2]);
 	c.blue = atoi(argv[3]);
-	printf("%d %d %d\n", c.red, c.green, c.blue);
 	fh = open("/dev/rgb", O_WRONLY);
 	if (fh < 0) {
 		perror("open: ");

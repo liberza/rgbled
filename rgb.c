@@ -106,7 +106,6 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			}
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				printk(KERN_INFO "rgb: invalid color value\n");
-				printk(KERN_INFO "red:%d, green:%d, blue:%d\n", c.red, c.green, c.blue);
 				return -EINVAL;
 				break;
 			}
