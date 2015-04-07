@@ -11,6 +11,9 @@
 #define RGB_SET_RW	_IOWR(RGBIOCTL_MAGIC, 1, colors_t *)
 #define RGB_READ	_IOR(RGBIOCTL_MAGIC, 1, colors_t *)	
 #define ever ;;
+
+// Tests rgb driver
+// See testcases.txt for individual test details
 int main(int argc, char *argv[])
 {
 	typedef struct {
