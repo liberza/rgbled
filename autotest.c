@@ -157,15 +157,7 @@ int main(int argc, char *argv[])
 	close(fh);
 	// open as read-only
 	fh = open("/dev/rgb", O_RDONLY);
-	if (fh < 0) {
-		perror("open: ");
-		exit(EXIT_FAILURE);
-	}
-
-	if ((read(fh, NULL, 1)) < 0) {
-		if (errno == EINVAL) printf("13: pass\n");
-		else printf("13: fail\n");
-	}
+	if (errno == EINVAL) printf("13: pass\n");
 	else printf("13: fail\n");
 	close(fh);
 	// open as write-only for next tests
