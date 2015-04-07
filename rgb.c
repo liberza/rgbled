@@ -63,7 +63,7 @@ int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb read from device\n");
 	#endif
-	return -ENOSYS;
+	return -EINVAL;
 }
  
 ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
