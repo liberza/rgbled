@@ -116,7 +116,6 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			}
 			// wait for lock
 			mutex_lock(&rgbdev.lock);
-			mdelay(5000);
 			red = c.red;
 			green = c.green;
 			blue = c.blue;
