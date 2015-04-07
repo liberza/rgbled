@@ -11,6 +11,7 @@
 #include <linux/gpio.h>
 #include <linux/ioctl.h>
 #include <linux/device.h>
+#include <linux/errno.h>
 
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
@@ -135,7 +136,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			break;
 		default:
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
-			return -ENOTSUP;
+			return -ENOTTY;
 	}
 
 	return 0;
