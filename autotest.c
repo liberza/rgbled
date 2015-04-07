@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 	c.blue = 0;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("14: fail\n");
 	else printf("14: pass (LED off)\n");
-	printf("Press enter to continue\n");
+	printf("Press enter to continue");
 	getchar();
 	
 	
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 	c.blue = 2047;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("15: fail\n");
 	else printf("15: pass (LED white)\n");
-	printf("Press enter to continue\n");
+	printf("Press enter to continue");
 	getchar();
 	
 	
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
 	c.blue = 0;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("16: fail\n");
 	else printf("16: pass (LED red)\n");
-	printf("Press enter to continue\n");
+	printf("Press enter to continue");
 	getchar();
 	
 
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 	c.blue = 0;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("17: fail\n");
 	else printf("17: pass (LED green)\n");
-	printf("Press enter to continue\n");
+	printf("Press enter to continue");
 	getchar();
 	
 
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 	c.blue = 2047;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("18: fail\n");
 	else printf("18: pass (LED blue)\n");
-	printf("Press enter to continue\n");
+	printf("Press enter to continue");
 	getchar();
 	
 
