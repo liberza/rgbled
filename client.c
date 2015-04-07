@@ -11,11 +11,11 @@
 int main(int argc, char *argv[])
 {
 	typedef struct {
-		int red, green, blue;
+	int red, green, blue;
 	} colors_t;
+
 	int fh;
 	colors_t c;
-
 	if (argc != 4) {
 		fprintf(stderr, "Usage: %s red green blue\n", argv[0]);
 		exit(EXIT_FAILURE);
