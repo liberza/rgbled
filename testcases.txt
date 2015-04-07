@@ -20,3 +20,5 @@
 | 16	| r=0,		g=2047,		b=0	| LED green	|
 | 17	| r=0,		g=0,		b=2047	| LED blue	|
 | 18	| r=0,		g=0,		b=0	| LED off	|
+| 19	| attempt ioctl(_IOR(*))		| -ENOTTY	|
+| 20	| attempt ioctl(_IORW(*))		| -ENOTTY	|
