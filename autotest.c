@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 	
 	// 12
 	errno = 0;
-	if ((write(fh, NULL, 0)) < 0) {
+	if ((write(fh, NULL, 1)) < 0) {
 		if (errno == ENOSYS) printf("12: pass\n");
 		else printf("12: fail\n");
 	}
@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
 	
 	// 13
 	errno = 0;
-	if ((read(fh, NULL, 0)) < 0) {
-		if (errno == ENOSYS) printf("13: pass\n");
+	if ((read(fh, NULL, 1)) < 0) {
+		if (errno == EINVAL) printf("13: pass\n");
 		else printf("13: fail\n");
 	}
 	else printf("13: fail\n");
