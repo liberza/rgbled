@@ -23,12 +23,8 @@
 #define BLUE 		24
 #define CLK  		25
 
-unsigned int red = 0;
-unsigned int green = 0;
-unsigned int blue = 0;
-
 typedef struct {
-	int red, green, blue;
+	unsigned int red, green, blue;
 } colors_t;
 
 static struct class *class;
@@ -38,7 +34,6 @@ struct rgb_dev {
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
-//	struct mutex lock;
 } rgbdev = {
 	.major_num = 0,
 	.ret = 0,
@@ -46,6 +41,7 @@ struct rgb_dev {
 };
 
 struct mutex lock;
+
 static struct gpio led_gpios[] = {
 	{RED, GPIOF_OUT_INIT_LOW, "Red"},
 	{GREEN, GPIOF_OUT_INIT_LOW, "Green"},
@@ -116,11 +112,6 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				return -EINVAL;
 				break;
 			}
-			// wait for lock
-//			red = c.red;
-//			green = c.green;
-//			blue = c.blue;
-			// send 11 bits of RGB data
 			for (i = 10; i >= 0; i--) {
 				if (~(c.red >> i) & 1) 
 					gpio_set_value(RED, 1);
