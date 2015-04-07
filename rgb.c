@@ -45,7 +45,7 @@ struct rgb_dev {
 	.dev_num = 0,
 };
 
-struct mutex *lock;
+struct mutex lock;
 static struct gpio led_gpios[] = {
 	{RED, GPIOF_OUT_INIT_LOW, "Red"},
 	{GREEN, GPIOF_OUT_INIT_LOW, "Green"},
@@ -100,6 +100,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	#endif
 	switch (ioctl_num) {
 		case RGB_SET:
+			mutex_lock(&lock);
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t))) {
 				printk(KERN_INFO "rgb: copy_from_user failed\n");
 				return -EACCES;
@@ -116,7 +117,6 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				break;
 			}
 			// wait for lock
-			mutex_lock(lock);
 //			red = c.red;
 //			green = c.green;
 //			blue = c.blue;
@@ -138,7 +138,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				gpio_set_value(CLK, 0);
 				udelay(10);
 			}
-			mutex_unlock(lock);
+			mutex_unlock(&lock);
 			break;
 		default:
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
@@ -193,7 +193,7 @@ static int __init rgb_init(void)
 		return -1;
 	}
 	// lock init
-	mutex_init(lock);
+	mutex_init(&lock);
 
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
