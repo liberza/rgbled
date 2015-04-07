@@ -176,56 +176,54 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	// 14
-	c.red = 0;
-	c.green = 0;
-	c.blue = 0;
+	// 14 
+	c.red = 2047;
+	c.green = 2047;
+	c.blue = 2047;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("14: fail\n");
-	else printf("14: pass (LED off)\n");
+	else printf("14: pass (LED white)\n");
 	printf("Press enter to continue");
 	getchar();
 	
 	
 	// 15
 	c.red = 2047;
-	c.green = 2047;
-	c.blue = 2047;
+	c.green = 0;
+	c.blue = 0;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("15: fail\n");
-	else printf("15: pass (LED white)\n");
+	else printf("15: pass (LED red)\n");
 	printf("Press enter to continue");
 	getchar();
 	
-	
+
 	// 16
-	c.red = 2047;
-	c.green = 0;
+	c.red = 0;
+	c.green = 2047;
 	c.blue = 0;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("16: fail\n");
-	else printf("16: pass (LED red)\n");
+	else printf("16: pass (LED green)\n");
 	printf("Press enter to continue");
 	getchar();
 	
 
 	// 17
 	c.red = 0;
-	c.green = 2047;
-	c.blue = 0;
+	c.green = 0;
+	c.blue = 2047;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("17: fail\n");
-	else printf("17: pass (LED green)\n");
+	else printf("17: pass (LED blue)\n");
 	printf("Press enter to continue");
 	getchar();
 	
-
 	// 18
 	c.red = 0;
 	c.green = 0;
-	c.blue = 2047;
+	c.blue = 0;
 	if (ioctl(fh, RGB_SET, &c) < 0) printf("18: fail\n");
-	else printf("18: pass (LED blue)\n");
+	else printf("18: pass (LED off)\n");
 	printf("Press enter to continue");
 	getchar();
 	
-
 
 	#if 0
 	for(ever) {
