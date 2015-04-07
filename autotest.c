@@ -215,6 +215,14 @@ int main(int argc, char *argv[])
 	printf("Press enter to continue");
 	getchar();
 	
+	// 19
+	errno = 0;
+	close(fh);
+	// open as read/write
+	fh = open("/dev/rgb", O_RDWR);
+	if (errno == EINVAL) printf("13: pass\n");
+	else printf("13: fail\n");
+	
 	close(fh);
 	return 0;
 }
