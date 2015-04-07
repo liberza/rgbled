@@ -1,31 +1,34 @@
 #!/usr/bin/perl
+# Fades from red to blue to green, with each RGB value
+# written by a different thread.
+$red = 2047;
 $green = 0;
-$blue = 2047;
+$blue = 0;
+$SIG{CHLD} = 'IGNORE';
 while ($red > 0) {
 	$pid = fork();
 	if (defined $pid && $pid == 0) {
-	#	system("./client " . $red . " " . $green . " " . $blue);
-		printf("$red, $green, $blue");
+		system("./client $red $green $blue");
 		exit 0;
 	}
 	$red--;
-	$blue++;
-}
-while ($blue > 0) {
-	$pid = fork();
-	if (defined $pid && $pid == 0) {
-		printf("$red, $green, $blue\n");
-		exit 0;
-	}
-	$blue--;
 	$green++;
 }
 while ($green > 0) {
 	$pid = fork();
 	if (defined $pid && $pid == 0) {
-		printf("$red, $green, $blue\n");
+		system("./client $red $green $blue");
 		exit 0;
 	}
 	$green--;
+	$blue++;
+}
+while ($green > 0) {
+	$pid = fork();
+	if (defined $pid && $pid == 0) {
+		system("./client $red $green $blue");
+		exit 0;
+	}
+	$blue--;
 	$red++;
 }
