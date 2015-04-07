@@ -2,6 +2,7 @@
 $red = 2047;
 $green = 0;
 $blue = 0;
+$SIG{CHLD} = 'IGNORE';
 while ($red > 0) {
 	$pid = fork();
 	if (defined $pid && $pid == 0) {
