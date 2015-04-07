@@ -3,20 +3,20 @@
 | Test  | Input					| Output	|
 | ----- | -------------------------------------	| -------------	|
 | 1	| r=undef,	g=undef,	b=undef	| -EINVAL	|
-| 2	| r=0,		g=0,		b=0	| LED off	|
-| 3	| r=2047,	g=2047,		b=2047	| LED white	|
-| 4	| r=2047,	g=0		b=0	| LED red	|
-| 5	| r=0,		g=2047,		b=0	| LED green	|
-| 6	| r=0,		g=0,		b=2047	| LED blue	|
-| 7	| r=-1,		g=-1,		b=-1	| -EINVAL	|
-| 8	| r=-1,		g=0,		b=0	| -EINVAL	|
-| 9	| r=0,		g=-1,		b=0	| -EINVAL	|
-| 10	| r=0,		g=0,		b=-1	| -EINVAL	|
-| 11	| r=2048,	g=2048,		b=2048	| -EINVAL	|
-| 12	| r=2048,	g=2047,		b=2047	| -EINVAL	|
-| 13	| r=2047,	g=2048,		b=2047	| -EINVAL	|
-| 14	| r=2047,	g=2047,		b=2048	| -EINVAL	|
-| 15	| open device as r/w			| -ENOTSUP	|
-| 16	| open device as read-only		| -ENOTSUP	|
-| 17	| attempt write to device		| -ENOTSUP	|
-| 18	| attempt read from device		| -ENOTSUP	|
+| 2	| r=-1,		g=-1,		b=-1	| -EINVAL	|
+| 3	| r=-1,		g=0,		b=0	| -EINVAL	|
+| 4	| r=0,		g=-1,		b=0	| -EINVAL	|
+| 5	| r=0,		g=0,		b=-1	| -EINVAL	|
+| 6	| r=2048,	g=2048,		b=2048	| -EINVAL	|
+| 7	| r=2048,	g=2047,		b=2047	| -EINVAL	|
+| 8	| r=2047,	g=2048,		b=2047	| -EINVAL	|
+| 9	| r=2047,	g=2047,		b=2048	| -EINVAL	|
+| 10	| open device as r/w			| -ENOTSUP	|
+| 11	| open device as read-only		| -ENOTSUP	|
+| 12	| attempt write to device		| -ENOTSUP	|
+| 13	| attempt read from device		| -ENOTSUP	|
+| 14	| r=0,		g=0,		b=0	| LED off	|
+| 15	| r=2047,	g=2047,		b=2047	| LED white	|
+| 16	| r=2047,	g=0		b=0	| LED red	|
+| 17	| r=0,		g=2047,		b=0	| LED green	|
+| 18	| r=0,		g=0,		b=2047	| LED blue	|
