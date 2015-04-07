@@ -11,6 +11,7 @@
 #include <linux/gpio.h>
 #include <linux/ioctl.h>
 #include <linux/device.h>
+#include <linux/stat.h>
 
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
@@ -59,6 +60,8 @@ int rgb_open(struct inode *inode, struct file *filp)
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: opened device\n");
 	#endif
+        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EINVAL;
+        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EINVAL;
 	return 0;
 }
 
