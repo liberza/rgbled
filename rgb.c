@@ -18,10 +18,10 @@
 #define DEVICE_NAME	"rgb"
 #define RGBIOCTL_MAGIC	0xB8
 #define RGB_SET _IOW(RGBIOCTL_MAGIC, 1, colors_t *)
-#define RED =		22
-#define GREEN =		23
-#define BLUE =		24
-#define CLK = 		25
+#define RED 		22
+#define GREEN 		23
+#define BLUE 		24
+#define CLK  		25
 
 unsigned int red = 0;
 unsigned int green = 0;
