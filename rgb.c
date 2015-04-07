@@ -11,7 +11,6 @@
 #include <linux/gpio.h>
 #include <linux/ioctl.h>
 #include <linux/device.h>
-#include <linux/errno.h>
 
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
@@ -64,8 +63,7 @@ int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb read from device\n");
 	#endif
-	errno = ENOTSUP;
-	return -1;
+	return -ENOSYS;
 }
  
 ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
@@ -73,8 +71,7 @@ ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: write to device\n");
 	#endif
-	errno = ENOTSUP;
-	return -1;
+	return -ENOSYS;
 }
 
 int rgb_close(struct inode *inode, struct file *filp)
