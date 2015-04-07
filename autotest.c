@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("1: pass\n");
 		else printf("1: fail\n");
 	}
+	else printf("1: fail\n");
+
 	// 2
 	errno = 0;
 	c.red = -1;
@@ -45,6 +47,7 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("2: pass\n");
 		else printf("2: fail\n");
 	}
+	else printf("2: fail\n");
 	// 3
 	errno = 0;
 	c.red = -1;
@@ -54,6 +57,8 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("3: pass\n");
 		else printf("3: fail\n");
 	}
+	else printf("3: fail\n");
+
 	// 4
 	errno = 0;
 	c.red = 0;
@@ -63,6 +68,8 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("4: pass\n");
 		else printf("4: fail\n");
 	}
+	else printf("4: fail\n");
+
 	// 5
 	errno = 0;
 	c.red = 0;
@@ -72,6 +79,8 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("5: pass\n");
 		else printf("5: fail\n");
 	}
+	else printf("5: fail\n");
+
 	// 6
 	errno = 0;
 	c.red = 2048;
@@ -81,6 +90,7 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("6: pass\n");
 		else printf("6: fail\n");
 	}
+	else printf("6: fail\n");
 
 	// 7
 	errno = 0;
@@ -91,6 +101,8 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("7: pass\n");
 		else printf("7: fail\n");
 	}
+	else printf("7: fail\n");
+
 	// 8
 	errno = 0;
 	c.red = 2047;
@@ -100,6 +112,7 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("8: pass\n");
 		else printf("8: fail\n");
 	}
+	else printf("8: fail\n");
 
 	// 9
 	errno = 0;
@@ -110,6 +123,7 @@ int main(int argc, char *argv[])
 		if (errno == EINVAL) printf("9: pass\n");
 		else printf("9: fail\n");
 	}
+	else printf("9: fail\n");
 
 	// 10
 	errno = 0;
@@ -117,23 +131,30 @@ int main(int argc, char *argv[])
 	c.green = 2047;
 	c.blue = 2047;
 	if (ioctl(fh, RGB_SET_RW, &c) < 0) {
-		if (errno == ENOTSUP) printf("10: pass\n");
+		if (errno == ENOTTY) printf("10: pass\n");
 		else printf("10: fail\n");
 	}
+	else printf("10: fail\n");
 
 	// 11
 	errno = 0;
 	if (ioctl(fh, RGB_READ, &c) < 0) {
-		if (errno == ENOTSUP) printf("11: pass\n");
+		if (errno == ENOTTY) printf("11: pass\n");
 		else printf("11: fail\n");
 	}
+	else printf("11: fail\n");
 	
 	// 12
-	if ((write(fh, NULL, 0)) == ENOTSUP) printf("12: pass\n");
+	errno = 0;
+	if ((write(fh, NULL, 0)) < 0) {
+		if (errno == ENOTSUP) printf("12: pass\n");
+		else printf("12: fail\n");
+	}
 	else printf("12: fail\n");
 	
 	
 	// 13
+	errno = 0;
 	if ((read(fh, NULL, 0)) == ENOTSUP) printf("13: pass\n");
 	else printf("13: fail\n");
 	
