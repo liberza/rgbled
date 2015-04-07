@@ -38,13 +38,14 @@ struct rgb_dev {
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
-	struct mutex lock;
+//	struct mutex lock;
 } rgbdev = {
 	.major_num = 0,
 	.ret = 0,
 	.dev_num = 0,
 };
 
+struct mutex *lock;
 static struct gpio led_gpios[] = {
 	{RED, GPIOF_OUT_INIT_LOW, "Red"},
 	{GREEN, GPIOF_OUT_INIT_LOW, "Green"},
@@ -115,17 +116,17 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				break;
 			}
 			// wait for lock
-			mutex_lock(&rgbdev.lock);
-			red = c.red;
-			green = c.green;
-			blue = c.blue;
+			mutex_lock(lock);
+//			red = c.red;
+//			green = c.green;
+//			blue = c.blue;
 			// send 11 bits of RGB data
 			for (i = 10; i >= 0; i--) {
-				if (~(red >> i) & 1) 
+				if (~(c.red >> i) & 1) 
 					gpio_set_value(RED, 1);
-				if (~(green >> i) & 1) 
+				if (~(c.green >> i) & 1) 
 					gpio_set_value(GREEN, 1);
-				if (~(blue >> i) & 1) 
+				if (~(c.blue >> i) & 1) 
 					gpio_set_value(BLUE, 1);
 				udelay(1);
 				gpio_set_value(CLK, 1);
@@ -137,7 +138,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				gpio_set_value(CLK, 0);
 				udelay(10);
 			}
-			mutex_unlock(&rgbdev.lock);
+			mutex_unlock(lock);
 			break;
 		default:
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
@@ -192,7 +193,7 @@ static int __init rgb_init(void)
 		return -1;
 	}
 	// lock init
-	mutex_init(&rgbdev.lock);
+	mutex_init(lock);
 
 	// Request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
