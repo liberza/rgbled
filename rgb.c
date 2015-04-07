@@ -16,7 +16,7 @@
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgb"
-#define RGBIOCTL_MAGIC 0xB8
+#define RGBIOCTL_MAGIC	0xB8
 #define RGB_SET _IOW(RGBIOCTL_MAGIC, 1, colors_t *)
 
 unsigned int red = 0;
@@ -64,7 +64,7 @@ int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb read from device\n");
 	#endif
-	return -EINVAL;
+	return -ENOTSUP;
 }
  
 ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
@@ -72,7 +72,7 @@ ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: write to device\n");
 	#endif
-	return -EINVAL;
+	return -ENOTSUP;
 }
 
 int rgb_close(struct inode *inode, struct file *filp)
@@ -136,7 +136,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			break;
 		default:
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
-			return -EINVAL;
+			return -ENOTSUP;
 	}
 
 	return 0;
