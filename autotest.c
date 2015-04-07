@@ -6,20 +6,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#define RGBIOCTL_MAGIC 0xB8
+#define RGBIOCTL_MAGIC	0xB8
 #define RGB_SET 	_IOW(RGBIOCTL_MAGIC, 1, colors_t *)
 #define RGB_SET_RW	_IOWR(RGBIOCTL_MAGIC, 1, colors_t *)
 #define RGB_READ	_IOR(RGBIOCTL_MAGIC, 1, colors_t *)	
 #define ever ;;
 
-// Tests rgb driver
+// Tests rgb driver for correct output
 // See testcases.txt for individual test details
 int main(int argc, char *argv[])
 {
 	typedef struct {
 	int red, green, blue;
 	} colors_t;
-	int delay = 10;
 	int fh;
 	colors_t c;
 
@@ -224,32 +223,6 @@ int main(int argc, char *argv[])
 	printf("Press enter to continue");
 	getchar();
 	
-
-	#if 0
-	for(ever) {
-		while (c.red > 0) {
-			if (ioctl(fh, RGB_SET, &c) < 0)
-				perror("ioctl: ");
-			usleep(delay);
-			c.red--;
-			c.green++;
-		}
-		while (c.green > 0) {
-			if (ioctl(fh, RGB_SET, &c) < 0)
-				perror("ioctl: ");
-			usleep(delay);
-			c.green--;
-			c.blue++;
-		}
-		while (c.blue > 0) {
-			if (ioctl(fh, RGB_SET, &c) < 0)
-				perror("ioctl: ");
-			usleep(delay);
-			c.blue--;
-			c.red++;
-		}
-	}
-	#endif
 	close(fh);
 	return 0;
 }
