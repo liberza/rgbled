@@ -12,7 +12,6 @@
 #include <linux/ioctl.h>
 #include <linux/device.h>
 
-#define DEBUG
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgb"
