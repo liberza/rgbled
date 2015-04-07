@@ -11,12 +11,17 @@
 #include <linux/gpio.h>
 #include <linux/ioctl.h>
 #include <linux/device.h>
+#include <linux/stat.h>
 
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC	"Sets red, green and blue values for external LED"
 #define DEVICE_NAME	"rgb"
 #define RGBIOCTL_MAGIC	0xB8
 #define RGB_SET _IOW(RGBIOCTL_MAGIC, 1, colors_t *)
+#define RED 		22
+#define GREEN 		23
+#define BLUE 		24
+#define CLK  		25
 
 unsigned int red = 0;
 unsigned int green = 0;
@@ -41,10 +46,10 @@ struct rgb_dev {
 };
 
 static struct gpio led_gpios[] = {
-	{22, GPIOF_OUT_INIT_LOW, "Red"},
-	{23, GPIOF_OUT_INIT_LOW, "Green"},
-	{24, GPIOF_OUT_INIT_LOW, "Blue"},
-	{25, GPIOF_OUT_INIT_LOW, "Clock"},
+	{RED, GPIOF_OUT_INIT_LOW, "Red"},
+	{GREEN, GPIOF_OUT_INIT_LOW, "Green"},
+	{BLUE, GPIOF_OUT_INIT_LOW, "Blue"},
+	{CLK, GPIOF_OUT_INIT_LOW, "Clock"},
 };
 
 
@@ -55,6 +60,8 @@ int rgb_open(struct inode *inode, struct file *filp)
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: opened device\n");
 	#endif
+        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EINVAL;
+        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EINVAL;
 	return 0;
 }
 
@@ -116,19 +123,19 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			// send 11 bits of RGB data
 			for (i = 10; i >= 0; i--) {
 				if (~(red >> i) & 1) 
-					gpio_set_value(led_gpios[0].gpio, 1);
+					gpio_set_value(RED, 1);
 				if (~(green >> i) & 1) 
-					gpio_set_value(led_gpios[1].gpio, 1);
+					gpio_set_value(GREEN, 1);
 				if (~(blue >> i) & 1) 
-					gpio_set_value(led_gpios[2].gpio, 1);
+					gpio_set_value(BLUE, 1);
 				udelay(1);
-				gpio_set_value(led_gpios[3].gpio, 1);
+				gpio_set_value(CLK, 1);
 				udelay(4);
-				gpio_set_value(led_gpios[0].gpio, 0);	
-				gpio_set_value(led_gpios[1].gpio, 0);	
-				gpio_set_value(led_gpios[2].gpio, 0);
+				gpio_set_value(RED, 0);	
+				gpio_set_value(GREEN, 0);	
+				gpio_set_value(BLUE, 0);
 				udelay(6);
-				gpio_set_value(led_gpios[3].gpio, 0);
+				gpio_set_value(CLK, 0);
 				udelay(10);
 			}
 			mutex_unlock(&rgbdev.lock);
