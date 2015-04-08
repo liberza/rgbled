@@ -23,7 +23,7 @@ while ($green > 0) {
 	$green--;
 	$blue++;
 }
-while ($green > 0) {
+while ($blue > 0) {
 	$pid = fork();
 	if (defined $pid && $pid == 0) {
 		system("./client $red $green $blue");
