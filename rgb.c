@@ -30,7 +30,6 @@ typedef struct {
 
 // rgb_dev struct for keeping global variables to a minimum
 struct rgb_dev {
-	int ret;
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
@@ -38,7 +37,6 @@ struct rgb_dev {
 	struct class *class;
 } rgbdev = {
 	.major_num = 0,
-	.ret = 0,
 	.dev_num = 0,
 };
 
@@ -153,8 +151,9 @@ struct file_operations fops = {
 
 static int __init rgb_init(void)
 {
-	rgbdev.ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
-	if (rgbdev.ret < 0) {
+	int ret;
+	ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
+	if (ret < 0) {
 		printk(KERN_ALERT "rgb: allocating major num failed\n");
 		return rgbdev.ret;
 	}
@@ -167,8 +166,8 @@ static int __init rgb_init(void)
 	rgbdev.cdev = cdev_alloc();
 	rgbdev.cdev->ops = &fops;
 	rgbdev.cdev->owner = THIS_MODULE;
-	rgbdev.ret = cdev_add(rgbdev.cdev, rgbdev.dev_num, 1);
-	if (rgbdev.ret < 0) {
+	ret = cdev_add(rgbdev.cdev, rgbdev.dev_num, 1);
+	if (ret < 0) {
 		printk(KERN_ALERT "rgb: failed to add cdev\n");
 		return rgbdev.ret;
 	}
@@ -190,29 +189,29 @@ static int __init rgb_init(void)
 	mutex_init(&rgbdev.lock);
 
 	// request GPIOs
-	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
-	if (rgbdev.ret < 0) {
+	ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
+	if (ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error\n");
 		return rgbdev.ret;
 	}
 	// set GPIOs as output
-	rgbdev.ret = gpio_direction_output(led_gpios[0].gpio, 0);
-	if (rgbdev.ret < 0) {
+	ret = gpio_direction_output(led_gpios[0].gpio, 0);
+	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[1].gpio, 0);
-	if (rgbdev.ret < 0) {
+	ret = gpio_direction_output(led_gpios[1].gpio, 0);
+	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[2].gpio, 0);
-	if (rgbdev.ret < 0) {
+	ret = gpio_direction_output(led_gpios[2].gpio, 0);
+	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
-	rgbdev.ret = gpio_direction_output(led_gpios[3].gpio, 0);
-	if (rgbdev.ret < 0) {
+	ret = gpio_direction_output(led_gpios[3].gpio, 0);
+	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
 		return rgbdev.ret;
 	}
