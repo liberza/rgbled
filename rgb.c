@@ -174,7 +174,7 @@ static int __init rgb_init(void)
 	}
 
 	// create device class
-	if (IS_ERR(rgvdev.class = class_create(THIS_MODULE, "char"))) {
+	if (IS_ERR(rgbdev.class = class_create(THIS_MODULE, "char"))) {
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return -1;
