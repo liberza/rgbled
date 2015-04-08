@@ -28,9 +28,6 @@ typedef struct {
 	unsigned int red, green, blue;
 } colors_t;
 
-// device class
-static struct class *class;
-
 // rgb_dev struct for keeping global variables to a minimum
 struct rgb_dev {
 	int ret;
@@ -38,6 +35,7 @@ struct rgb_dev {
 	struct cdev *cdev;
 	int major_num;
 	struct mutex lock;
+	struct class *class;
 } rgbdev = {
 	.major_num = 0,
 	.ret = 0,
@@ -176,14 +174,14 @@ static int __init rgb_init(void)
 	}
 
 	// create device class
-	if (IS_ERR(class = class_create(THIS_MODULE, "char"))) {
+	if (IS_ERR(rgvdev.class = class_create(THIS_MODULE, "char"))) {
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return -1;
 	}
 	// create device file
-	if (IS_ERR(device_create(class, NULL, rgbdev.dev_num, NULL, "rgb"))) {
-		class_destroy(class);
+	if (IS_ERR(device_create(rgbdev.class, NULL, rgbdev.dev_num, NULL, "rgb"))) {
+		class_destroy(rgbdev.class);
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return -1;
@@ -235,11 +233,11 @@ static void __exit rgb_exit(void)
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: device_destroy\n");
 	#endif
-	device_destroy(class, rgbdev.dev_num);
+	device_destroy(rgbdev.class, rgbdev.dev_num);
 	#ifdef DEBUG
 	printk(KERN_INFO "rgb: class_destroy\n");
 	#endif
-	class_destroy(class);
+	class_destroy(rgbdev.class);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
 	printk(KERN_ALERT "rgb: unloaded\n");
 }
