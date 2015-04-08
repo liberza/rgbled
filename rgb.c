@@ -155,7 +155,7 @@ static int __init rgb_init(void)
 	ret = alloc_chrdev_region(&rgbdev.dev_num, 0, 1, DEVICE_NAME);
 	if (ret < 0) {
 		printk(KERN_ALERT "rgb: allocating major num failed\n");
-		return rgbdev.ret;
+		return ret;
 	}
 
 	rgbdev.major_num = MAJOR(rgbdev.dev_num);
@@ -169,7 +169,7 @@ static int __init rgb_init(void)
 	ret = cdev_add(rgbdev.cdev, rgbdev.dev_num, 1);
 	if (ret < 0) {
 		printk(KERN_ALERT "rgb: failed to add cdev\n");
-		return rgbdev.ret;
+		return ret;
 	}
 
 	// create device class
@@ -192,28 +192,28 @@ static int __init rgb_init(void)
 	ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error\n");
-		return rgbdev.ret;
+		return ret;
 	}
 	// set GPIOs as output
 	ret = gpio_direction_output(led_gpios[0].gpio, 0);
 	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
-		return rgbdev.ret;
+		return ret;
 	}
 	ret = gpio_direction_output(led_gpios[1].gpio, 0);
 	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
-		return rgbdev.ret;
+		return ret;
 	}
 	ret = gpio_direction_output(led_gpios[2].gpio, 0);
 	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
-		return rgbdev.ret;
+		return ret;
 	}
 	ret = gpio_direction_output(led_gpios[3].gpio, 0);
 	if (ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
-		return rgbdev.ret;
+		return ret;
 	}
 
 	return 0;
