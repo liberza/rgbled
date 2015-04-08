@@ -98,7 +98,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t))) {
 				printk(KERN_INFO "rgb: copy_from_user failed\n");
 				mutex_unlock(&rgbdev.lock);
-				return -EACCES;
+				return -EFAULT;
 				break;
 			}
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
