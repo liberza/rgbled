@@ -40,6 +40,7 @@ struct rgb_dev {
 	.dev_num = 0,
 };
 
+// array of gpio structs to be used in gpio_request_array()
 static struct gpio led_gpios[] = {
 	{RED, GPIOF_OUT_INIT_LOW, "Red"},
 	{GREEN, GPIOF_OUT_INIT_LOW, "Green"},

@@ -217,14 +217,22 @@ int main(int argc, char *argv[])
 	else printf("18: pass (LED off)\n");
 	printf("Press enter to continue");
 	getchar();
-	
+
 	// 19
+	errno = 0;
+	if (ioctl(fh, RGB_SET, NULL) < 0) {
+                if (errno == EFAULT) printf("19: pass\n");
+                else printf("19: fail\n");
+        }
+        else printf("19: fail\n");
+	
+	// 20 
 	errno = 0;
 	close(fh);
 	// open as read/write
 	fh = open("/dev/rgb", O_RDWR);
-	if (errno == EINVAL) printf("19: pass\n");
-	else printf("19: fail\n");
+	if (errno == EINVAL) printf("20: pass\n");
+	else printf("20: fail\n");
 	
 	close(fh);
 	return 0;
