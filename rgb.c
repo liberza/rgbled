@@ -141,13 +141,13 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	return 0;
 }
 
-struct file_operations fops = {
-	.owner =		THIS_MODULE,
-	.open = 		rgb_open,
-	.read = 		rgb_read,
-	.write =		rgb_write,
-	.release =		rgb_close,
-	.unlocked_ioctl =	rgb_ioctl,
+struct file_operations rgbfops = {
+	.owner =                THIS_MODULE,
+	.open =                 rgb_open,
+	.read =                 rgb_read,
+	.write =                rgb_write,
+	.release =              rgb_close,
+	.unlocked_ioctl =       rgb_ioctl,
 };
 
 static int __init rgb_init(void)
@@ -165,7 +165,7 @@ static int __init rgb_init(void)
 	#endif
 
 	rgbdev.cdev = cdev_alloc();
-	rgbdev.cdev->ops = &fops;
+	rgbdev.cdev->ops = &rgbfops;
 	rgbdev.cdev->owner = THIS_MODULE;
 	ret = cdev_add(rgbdev.cdev, rgbdev.dev_num, 1);
 	if (ret < 0) {
