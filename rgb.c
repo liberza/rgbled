@@ -14,33 +14,35 @@
 #include <linux/stat.h>
 
 #define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
-#define DRIVER_DESC	"Sets red, green and blue values for external LED"
-#define DEVICE_NAME	"rgb"
+#define DRIVER_DESC		"Sets red, green and blue values for external LED"
+#define DEVICE_NAME		"rgb"
 #define RGBIOCTL_MAGIC	0xB8
+#define RED 			22
+#define GREEN 			23
+#define BLUE 			24
+#define CLK  			25
 #define RGB_SET _IOW(RGBIOCTL_MAGIC, 1, colors_t *)
-#define RED 		22
-#define GREEN 		23
-#define BLUE 		24
-#define CLK  		25
 
+// struct for getting color data from ioctl
 typedef struct {
 	unsigned int red, green, blue;
 } colors_t;
 
+// device class
 static struct class *class;
 
+// rgb_dev struct for keeping global variables to a minimum
 struct rgb_dev {
 	int ret;
 	dev_t dev_num;
 	struct cdev *cdev;
 	int major_num;
+	struct mutex lock;
 } rgbdev = {
 	.major_num = 0,
 	.ret = 0,
 	.dev_num = 0,
 };
-
-struct mutex lock;
 
 static struct gpio led_gpios[] = {
 	{RED, GPIOF_OUT_INIT_LOW, "Red"},
@@ -96,22 +98,22 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	#endif
 	switch (ioctl_num) {
 		case RGB_SET:
-			mutex_lock(&lock);
+			mutex_lock(&rgbdev.lock);
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t))) {
 				printk(KERN_INFO "rgb: copy_from_user failed\n");
-				mutex_unlock(&lock);
+				mutex_unlock(&rgbdev.lock);
 				return -EACCES;
 				break;
 			}
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				printk(KERN_INFO "rgb: invalid color value\n");
-				mutex_unlock(&lock);
+				mutex_unlock(&rgbdev.lock);
 				return -EINVAL;
 				break;
 			}
 			else if ((c.red < 0) | (c.green < 0) | (c.blue < 0)) {
 				printk(KERN_INFO "rgb: invalid color value\n");
-				mutex_unlock(&lock);
+				mutex_unlock(&rgbdev.lock);
 				return -EINVAL;
 				break;
 			}
@@ -132,7 +134,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				gpio_set_value(CLK, 0);
 				udelay(10);
 			}
-			mutex_unlock(&lock);
+			mutex_unlock(&rgbdev.lock);
 			break;
 		default:
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
@@ -173,13 +175,13 @@ static int __init rgb_init(void)
 		return rgbdev.ret;
 	}
 
-	// create device file
+	// create device class
 	if (IS_ERR(class = class_create(THIS_MODULE, "char"))) {
 		cdev_del(rgbdev.cdev);
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return -1;
 	}
-
+	// create device file
 	if (IS_ERR(device_create(class, NULL, rgbdev.dev_num, NULL, "rgb"))) {
 		class_destroy(class);
 		cdev_del(rgbdev.cdev);
@@ -187,15 +189,15 @@ static int __init rgb_init(void)
 		return -1;
 	}
 	// lock init
-	mutex_init(&lock);
+	mutex_init(&rgbdev.lock);
 
-	// Request GPIOs
+	// request GPIOs
 	rgbdev.ret = gpio_request_array(led_gpios, ARRAY_SIZE(led_gpios));
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_request_array() error\n");
 		return rgbdev.ret;
 	}
-	// Set GPIOs as output
+	// set GPIOs as output
 	rgbdev.ret = gpio_direction_output(led_gpios[0].gpio, 0);
 	if (rgbdev.ret < 0) {
 		printk(KERN_ALERT "gpio_direction_output() error\n");
