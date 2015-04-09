@@ -13,10 +13,10 @@
 #include <linux/device.h>
 #include <linux/stat.h>
 
-#define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
+#define DRIVER_AUTHOR		"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC		"Sets red, green and blue values for external LED"
 #define DEVICE_NAME		"rgb"
-#define RGBIOCTL_MAGIC	0xB8
+#define RGBIOCTL_MAGIC		0xB8
 #define RED 			22
 #define GREEN 			23
 #define BLUE 			24
