@@ -12,21 +12,11 @@
 #include <linux/ioctl.h>
 #include <linux/device.h>
 #include <linux/stat.h>
+#include "rgb.h"
 
 #define DRIVER_AUTHOR		"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC		"Sets red, green and blue values for external LED"
 #define DEVICE_NAME		"rgb"
-#define RGBIOCTL_MAGIC		0xB8
-#define RED 			22
-#define GREEN 			23
-#define BLUE 			24
-#define CLK  			25
-#define RGB_SET _IOW(RGBIOCTL_MAGIC, 1, colors_t *)
-
-// struct for getting color data from ioctl
-typedef struct {
-	unsigned int red, green, blue;
-} colors_t;
 
 // rgb_dev struct for keeping global variables to a minimum
 struct rgb_dev {
@@ -49,7 +39,7 @@ static struct gpio led_gpios[] = {
 };
 
 // Implementation of file operation methods
-int rgb_open(struct inode *inode, struct file *filp)
+static int rgb_open(struct inode *inode, struct file *filp)
 {
 		// Only opening as write-only is permitted
         if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EOPNOTSUPP;
@@ -59,24 +49,24 @@ int rgb_open(struct inode *inode, struct file *filp)
 
 // Should never get called, if permissions on device file are correct
 // but if it does, tell the user "operation not permitted" 
-int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
+static int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 {
 	return -EOPNOTSUPP;
 }
  
 // Not permitted, must pass data via ioctl
-ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
+static ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
 {
 	return -EOPNOTSUPP;
 }
 
-int rgb_close(struct inode *inode, struct file *filp)
+static int rgb_close(struct inode *inode, struct file *filp)
 {
 	return 0;
 }
 
 // Get data from user, then send color bits via GPIO
-long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
+static long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	int i=0;
 	colors_t c;
@@ -130,7 +120,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	return 0;
 }
 
-struct file_operations rgbfops = {
+static struct file_operations rgbfops = {
 	.owner =                THIS_MODULE,
 	.open =                 rgb_open,
 	.read =                 rgb_read,
@@ -157,9 +147,6 @@ static int __init rgb_init(void)
 	}
 
 	rgbdev.major_num = MAJOR(rgbdev.dev_num);
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: major num = %d\n", rgbdev.major_num);
-	#endif
 
 	rgbdev.cdev = cdev_alloc();
 	rgbdev.cdev->ops = &rgbfops;
@@ -221,21 +208,9 @@ static int __init rgb_init(void)
 
 static void __exit rgb_exit(void)
 {
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: deleting cdev\n"); 
-	#endif
 	cdev_del(rgbdev.cdev);
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: gpio_free_array\n"); 
-	#endif
 	gpio_free_array(led_gpios, ARRAY_SIZE(led_gpios));
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: device_destroy\n");
-	#endif
 	device_destroy(rgbdev.class, rgbdev.dev_num);
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: class_destroy\n");
-	#endif
 	class_destroy(rgbdev.class);
 	unregister_chrdev_region(rgbdev.dev_num, 1);
 	printk(KERN_ALERT "rgb: unloaded\n");
