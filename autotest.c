@@ -14,8 +14,6 @@
 
 // Tests rgb driver for correct output
 // See testcases.txt for individual test details
-// NOTE: tests 13 and 19 will fail if user doesn't have
-// 	 read/write permission on /dev/rgb
 
 int main(int argc, char *argv[])
 {
@@ -149,7 +147,7 @@ int main(int argc, char *argv[])
 	// 12
 	errno = 0;
 	if ((write(fh, NULL, 1)) < 0) {
-		if (errno == EPERM) printf("12: pass\n");
+		if (errno == ENOTSUP) printf("12: pass\n");
 		else printf("12: fail\n");
 	}
 	else printf("12: fail\n");
@@ -160,7 +158,8 @@ int main(int argc, char *argv[])
 	close(fh);
 	// open as read-only
 	fh = open("/dev/rgb", O_RDONLY);
-	if (errno == EPERM) printf("13: pass\n");
+	// handle user not having read access to device file, as they shouldn't.
+	if ((errno == ENOTSUP) || (errno == EACCES)) printf("13: pass\n");
 	else printf("13: fail\n");
 	close(fh);
 	// open as write-only for next tests
@@ -231,7 +230,8 @@ int main(int argc, char *argv[])
 	close(fh);
 	// open as read/write
 	fh = open("/dev/rgb", O_RDWR);
-	if (errno == EPERM) printf("20: pass\n");
+	// handle user not having read access to device file
+	if ((errno == ENOTSUP) || (errno == EACCES)) printf("20: pass\n");
 	else printf("20: fail\n");
 	
 	close(fh);

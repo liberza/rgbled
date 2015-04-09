@@ -52,8 +52,8 @@ static struct gpio led_gpios[] = {
 int rgb_open(struct inode *inode, struct file *filp)
 {
 		// Only opening as write-only is permitted
-        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -ENOTSUP;
-        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -ENOTSUP;
+        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EOPNOTSUPP;
+        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EOPNOTSUPP;
 	return 0;
 }
 
@@ -61,13 +61,13 @@ int rgb_open(struct inode *inode, struct file *filp)
 // but if it does, tell the user "operation not permitted" 
 int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 {
-	return -ENOTSUP;
+	return -EOPNOTSUPP;
 }
  
 // Not permitted, must pass data via ioctl
 ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
 {
-	return -ENOTSUP;
+	return -EOPNOTSUPP;
 }
 
 int rgb_close(struct inode *inode, struct file *filp)

@@ -13,12 +13,12 @@
 | 9     | r=2047,       g=2047,         b=2048  | EINVAL        |
 | 10    | attempt ioctl(_IORW*)                 | ENOTTY        |
 | 11    | attempt ioctl(_IOR*)                  | ENOTTY        |
-| 12    | attempt write to device file          | EPERM         |
-| 13    | open device as read-only              | EPERM         |
+| 12    | attempt write to device file          | ENOTSUP	|
+| 13    | open device as read-only              | ENOTSUP       |
 | 14    | r=2047,       g=2047,         b=2047  | LED white     |
 | 15    | r=2047,       g=0             b=0     | LED red       |
 | 16    | r=0,          g=2047,         b=0     | LED green     |
 | 17    | r=0,          g=0,            b=2047  | LED blue      |
 | 18    | r=0,          g=0,            b=0     | LED off       |
 | 19    | pass NULL to ioctl                    | EFAULT        |
-| 20    | open device as r/w                    | EPERM         |
+| 20    | open device as r/w                    | ENOTSUP       |
