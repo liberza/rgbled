@@ -13,10 +13,10 @@
 #include <linux/device.h>
 #include <linux/stat.h>
 
-#define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
+#define DRIVER_AUTHOR		"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC		"Sets red, green and blue values for external LED"
 #define DEVICE_NAME		"rgb"
-#define RGBIOCTL_MAGIC	0xB8
+#define RGBIOCTL_MAGIC		0xB8
 #define RED 			22
 #define GREEN 			23
 #define BLUE 			24
@@ -48,9 +48,7 @@ static struct gpio led_gpios[] = {
 	{CLK, GPIOF_OUT_INIT_LOW, "Clock"},
 };
 
-
 // Implementation of file operation methods
-
 int rgb_open(struct inode *inode, struct file *filp)
 {
 		// Only opening as write-only is permitted
@@ -129,7 +127,6 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 			printk(KERN_INFO "rgb: invalid ioctl command\n");
 			return -ENOTTY;
 	}
-
 	return 0;
 }
 
@@ -141,6 +138,14 @@ struct file_operations rgbfops = {
 	.release =              rgb_close,
 	.unlocked_ioctl =       rgb_ioctl,
 };
+
+
+static char *st_devnode(struct device *dev, umode_t *mode)
+{
+	// Set the device special file to writable by anybody
+	if (mode) *mode = 0622; 
+	return NULL;
+}
 
 static int __init rgb_init(void)
 {
@@ -171,6 +176,8 @@ static int __init rgb_init(void)
 		unregister_chrdev_region(rgbdev.dev_num, 1);
 		return -1;
 	}
+	// store pointer to st_devnode() to be called when device file is created
+	rgbdev.class->devnode = st_devnode;
 	// create device file
 	if (IS_ERR(device_create(rgbdev.class, NULL, rgbdev.dev_num, NULL, "rgb"))) {
 		class_destroy(rgbdev.class);

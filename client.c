@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Usage: %s red green blue\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
+	// No error checking done on input arguments, that's left to
+	// checking errno after calling ioctl
 	c.red = atoi(argv[1]);
 	c.green = atoi(argv[2]);
 	c.blue = atoi(argv[3]);
