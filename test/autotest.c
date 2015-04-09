@@ -213,10 +213,10 @@ int main(int argc, char *argv[])
 	// 19
 	errno = 0;
 	if (ioctl(fh, RGB_SET, NULL) < 0) {
-                if (errno == EFAULT) printf("19: pass\n");
-                else printf("19: fail\n");
-        }
+		if (errno == EFAULT) printf("19: pass\n");
         else printf("19: fail\n");
+    }
+    else printf("19: fail\n");
 	
 	// 20 
 	errno = 0;

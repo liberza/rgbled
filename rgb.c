@@ -14,7 +14,7 @@
 #include <linux/stat.h>
 #include "rgb.h"
 
-#define DRIVER_AUTHOR		"Nick Levesque <nick.levesque@gmail.com>"
+#define DRIVER_AUTHOR	"Nick Levesque <nick.levesque@gmail.com>"
 #define DRIVER_DESC		"Sets red, green and blue values for external LED"
 #define DEVICE_NAME		"rgb"
 
@@ -41,15 +41,15 @@ static struct gpio led_gpios[] = {
 // Implementation of file operation methods
 static int rgb_open(struct inode *inode, struct file *filp)
 {
-		// Only opening as write-only is permitted
-        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EOPNOTSUPP;
-        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EOPNOTSUPP;
+	// Only opening as write-only is permitted
+	if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EOPNOTSUPP;
+	if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EOPNOTSUPP;
 	return 0;
 }
 
 // Should never get called, if permissions on device file are correct
 // but if it does, tell the user "operation not permitted" 
-static int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
+static ssize_t rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 {
 	return -EOPNOTSUPP;
 }
