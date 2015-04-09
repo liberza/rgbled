@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 	// 12
 	errno = 0;
 	if ((write(fh, NULL, 1)) < 0) {
-		if (errno == ENOSYS) printf("12: pass\n");
+		if (errno == EPERM) printf("12: pass\n");
 		else printf("12: fail\n");
 	}
 	else printf("12: fail\n");
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 	close(fh);
 	// open as read-only
 	fh = open("/dev/rgb", O_RDONLY);
-	if (errno == EINVAL) printf("13: pass\n");
+	if (errno == EPERM) printf("13: pass\n");
 	else printf("13: fail\n");
 	close(fh);
 	// open as write-only for next tests
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
 	close(fh);
 	// open as read/write
 	fh = open("/dev/rgb", O_RDWR);
-	if (errno == EINVAL) printf("20: pass\n");
+	if (errno == EPERM) printf("20: pass\n");
 	else printf("20: fail\n");
 	
 	close(fh);
