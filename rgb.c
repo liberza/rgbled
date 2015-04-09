@@ -96,12 +96,14 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 	switch (ioctl_num) {
 		case RGB_SET:
 			mutex_lock(&rgbdev.lock);
+			// get RGB data from user
 			if (copy_from_user(&c, (colors_t *)ioctl_param, sizeof(colors_t))) {
 				printk(KERN_INFO "rgb: copy_from_user failed\n");
 				mutex_unlock(&rgbdev.lock);
 				return -EFAULT;
 				break;
 			}
+			// check that passed data is valid
 			if ((c.red > 2047) | (c.green > 2047) | (c.blue > 2047)) {
 				printk(KERN_INFO "rgb: invalid color value\n");
 				mutex_unlock(&rgbdev.lock);
@@ -114,6 +116,7 @@ long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_pa
 				return -EINVAL;
 				break;
 			}
+			// send bits over GPIO
 			for (i = 10; i >= 0; i--) {
 				if (~(c.red >> i) & 1) 
 					gpio_set_value(RED, 1);
