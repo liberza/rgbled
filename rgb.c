@@ -206,6 +206,7 @@ static int __init rgb_init(void)
 	return 0;
 }
 
+// exit, clean up everything from rgb_init()
 static void __exit rgb_exit(void)
 {
 	cdev_del(rgbdev.cdev);

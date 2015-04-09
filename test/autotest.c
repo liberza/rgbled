@@ -6,20 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#define RGBIOCTL_MAGIC	0xB8
-#define RGB_SET 	_IOW(RGBIOCTL_MAGIC, 1, colors_t *)
-#define RGB_SET_RW	_IOWR(RGBIOCTL_MAGIC, 1, colors_t *)
-#define RGB_READ	_IOR(RGBIOCTL_MAGIC, 1, colors_t *)	
-#define ever ;;
+#include "rgb.h"
 
 // Tests rgb driver for correct output
 // See testcases.txt for individual test details
 
 int main(int argc, char *argv[])
 {
-	typedef struct {
-	int red, green, blue;
-	} colors_t;
 	int fh;
 	colors_t c;
 
