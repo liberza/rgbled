@@ -53,46 +53,35 @@ static struct gpio led_gpios[] = {
 
 int rgb_open(struct inode *inode, struct file *filp)
 {
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: opened device\n");
-	#endif
-        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EINVAL;
-        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EINVAL;
+		// Only opening as write-only is permitted
+        if ((filp->f_flags&O_ACCMODE)==O_RDONLY) return -EPERM;
+        if ((filp->f_flags&O_ACCMODE)==O_RDWR) return -EPERM;
 	return 0;
 }
 
+// Should never get called, if permissions on device file are correct
+// but if it does, tell the user "operation not permitted" 
 int rgb_read(struct file *filp, char *buf, size_t buf_cnt, loff_t* offset)
 {
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb read from device\n");
-	#endif
-	return -EINVAL;
+	return -EPERM;
 }
  
+// Not permitted, must pass data via ioctl
 ssize_t rgb_write(struct file *filp, const char *src_buf, size_t buf_cnt, loff_t* offset)
 {
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: write to device\n");
-	#endif
-	return -ENOSYS;
+	return -EPERM;
 }
 
 int rgb_close(struct inode *inode, struct file *filp)
 {
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: close device\n");
-	#endif
 	return 0;
 }
 
+// Get data from user, then send color bits via GPIO
 long rgb_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	int i=0;
 	colors_t c;
-	#ifdef DEBUG
-	printk(KERN_INFO "rgb: ioctl\n");
-	printk(KERN_INFO "ioctl_num: %d\n", ioctl_num);
-	#endif
 	switch (ioctl_num) {
 		case RGB_SET:
 			mutex_lock(&rgbdev.lock);
