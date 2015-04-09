@@ -1,3 +1,5 @@
+# After running make, insert module with:
+# `insmod rgb.ko`
 obj-m += rgb.o
 
 all:
